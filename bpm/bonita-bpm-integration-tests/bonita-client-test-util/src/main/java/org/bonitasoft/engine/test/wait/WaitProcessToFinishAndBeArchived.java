@@ -14,11 +14,16 @@
  */
 package org.bonitasoft.engine.test.wait;
 
+import static org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor.SOURCE_OBJECT_ID;
+import static org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor.STATE_ID;
+
 import java.util.List;
 
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
@@ -26,19 +31,36 @@ import org.bonitasoft.engine.test.WaitUntil;
 @Deprecated
 public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
 
-    private final ProcessInstance processInstance;
+    private final long processInstanceId;
 
     private final ProcessAPI processAPI;
 
-    private final String state;
+    private String state = null;
 
     @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
             final ProcessAPI processAPI, final String state) {
         super(repeatEach, timeout, throwExceptions);
-        this.processInstance = processInstance;
+        processInstanceId = processInstance.getId();
         this.processAPI = processAPI;
         this.state = state;
+    }
+
+    @Deprecated
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final long processInstanceId,
+            final ProcessAPI processAPI, final String state) {
+        super(repeatEach, timeout, throwExceptions);
+        this.processInstanceId = processInstanceId;
+        this.processAPI = processAPI;
+        this.state = state;
+    }
+
+    @Deprecated
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final long processInstanceId,
+            final ProcessAPI processAPI) {
+        super(repeatEach, timeout, throwExceptions);
+        this.processInstanceId = processInstanceId;
+        this.processAPI = processAPI;
     }
 
     @Deprecated
@@ -48,14 +70,24 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
     }
 
     @Deprecated
+    public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final long processInstanceId, final ProcessAPI processAPI) {
+        this(repeatEach, timeout, true, processInstanceId, processAPI);
+    }
+
+    @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final ProcessAPI processAPI) {
         this(repeatEach, timeout, false, processInstance, processAPI);
     }
 
     @Override
-    protected boolean check() {
-        final List<ArchivedProcessInstance> archivedProcessInstances = processAPI.getArchivedProcessInstances(processInstance.getId(), 0, 200);
-        return APITestUtil.containsState(archivedProcessInstances, state);
+    protected boolean check() throws SearchException {
+        if (state != null) {
+            final List<ArchivedProcessInstance> archivedProcessInstances = processAPI.getArchivedProcessInstances(processInstanceId, 0, 20);
+            return APITestUtil.containsState(archivedProcessInstances, state);
+        } else {
+            return processAPI.searchArchivedProcessInstances(
+                    new SearchOptionsBuilder(0, 20).filter(SOURCE_OBJECT_ID, processInstanceId).filter(STATE_ID, 6).done()).getCount() == 1;
+        }
     }
 
 }

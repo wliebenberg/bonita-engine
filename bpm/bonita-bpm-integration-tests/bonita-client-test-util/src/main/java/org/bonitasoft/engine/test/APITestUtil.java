@@ -831,6 +831,16 @@ public class APITestUtil {
         return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
+    @Deprecated
+    private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final long processInstanceId) throws Exception {
+        return new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstanceId, processAPI).waitUntil();
+    }
+
+    @Deprecated
+    protected boolean waitProcessToFinishAndBeArchived(final long processInstanceId) throws Exception {
+        return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstanceId);
+    }
+
     private Long waitForFlowNode(final long processInstanceId, final String state, final String flowNodeName, final boolean useRootProcessInstance,
             final int timeout) throws Exception {
         Map<String, Serializable> params;
@@ -1669,7 +1679,7 @@ public class APITestUtil {
         return themeAPI;
     }
 
-    protected void setThemeAPI(ThemeAPI themeAPI) {
+    protected void setThemeAPI(final ThemeAPI themeAPI) {
         this.themeAPI = themeAPI;
     }
 
