@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,7 +34,18 @@ public interface Recorder {
      * @throws SRecorderException
      * @since 6.0
      */
+    @Deprecated
     void recordInsert(InsertRecord record, SInsertEvent insertEvent) throws SRecorderException;
+
+    /**
+     * Inserts an entity, and fire event if necessary
+     * 
+     * @param record
+     *            the record for insert
+     * @throws SRecorderException
+     * @since 6.3
+     */
+    void recordInsert(InsertRecord record) throws SRecorderException;
 
     /**
      * Delete a record from database
@@ -46,7 +57,18 @@ public interface Recorder {
      * @throws SRecorderException
      * @since 6.0
      */
+    @Deprecated
     void recordDelete(DeleteRecord record, SDeleteEvent deleteEvent) throws SRecorderException;
+
+    /**
+     * Deletes a record and fire an event if necessary
+     * 
+     * @param record
+     *            the record for insert
+     * @throws SRecorderException
+     * @since 6.3
+     */
+    void recordDelete(DeleteRecord record) throws SRecorderException;
 
     /**
      * Update a record from database
@@ -58,13 +80,25 @@ public interface Recorder {
      * @throws SRecorderException
      * @since 6.0
      */
+    @Deprecated
     void recordUpdate(UpdateRecord record, SUpdateEvent updateEvent) throws SRecorderException;
+
+    /**
+     * Updates a record and fire an event if necessary
+     * 
+     * @param record
+     *            the record for insert
+     * @throws SRecorderException
+     * @since 6.3
+     */
+    void recordUpdate(UpdateRecord record) throws SRecorderException;
 
     /**
      * @param record
      * @param insertEvent
      * @throws SRecorderException
      */
+    @Deprecated
     void recordBatchInsert(BatchInsertRecord record, SInsertEvent insertEvent) throws SRecorderException;
 
     /**
