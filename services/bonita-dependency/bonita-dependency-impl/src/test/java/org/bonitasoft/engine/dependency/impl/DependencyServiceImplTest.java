@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.dependency.impl;
 
 import static org.mockito.Matchers.any;
@@ -28,7 +15,6 @@ import org.bonitasoft.engine.dependency.SDependencyMappingNotFoundException;
 import org.bonitasoft.engine.dependency.SDependencyNotFoundException;
 import org.bonitasoft.engine.dependency.model.SDependency;
 import org.bonitasoft.engine.dependency.model.SDependencyMapping;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -50,8 +36,6 @@ public class DependencyServiceImplTest {
 
     private Recorder recorder;
 
-    private EventService eventService;
-
     private TechnicalLoggerService logger;
 
     private QueriableLoggerService queriableLoggerService;
@@ -64,17 +48,12 @@ public class DependencyServiceImplTest {
     public void setUp() {
         persistenceService = mock(ReadPersistenceService.class);
         recorder = mock(Recorder.class);
-        eventService = mock(EventService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
         logger = mock(TechnicalLoggerService.class);
         classLoaderService = mock(ClassLoaderService.class);
-        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, eventService, logger, queriableLoggerService,
-                classLoaderService);
+        dependencyServiceImpl = new DependencyServiceImpl(persistenceService, recorder, logger, queriableLoggerService, classLoaderService);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependency(long)}.
-     */
     @Test
     public final void getDependencyById() throws SBonitaReadException, SDependencyNotFoundException {
         final SDependency sDependency = mock(SDependency.class);
@@ -97,9 +76,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependency(456L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencies(java.util.Collection)}.
-     */
     @Test
     public final void getDependenciesByIds() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
@@ -115,9 +91,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencies(Collections.singletonList(456L));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencies(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public final void getDependenciesWithOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
@@ -135,11 +108,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencies(options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyIds(long, java.lang.String, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getDependencyIds() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
@@ -157,9 +125,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencyIds(54156L, "artifactType", options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMapping(long)}.
-     */
     @Test
     public final void getDependencyMappingById() throws SBonitaReadException, SDependencyMappingNotFoundException {
         final SDependencyMapping sDependencyMapping = mock(SDependencyMapping.class);
@@ -182,11 +147,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencyMapping(456L);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMappings(long, java.lang.String, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getDependencyMappingsWithArtifactIdAndTypeAndQueryOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
@@ -204,10 +164,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencyMappings(54156L, "artifactType", options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMappings(long, org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public final void getDependencyMappingsWithDependencyIdAndQueryOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
@@ -225,10 +181,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencyMappings(54156L, options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDependencyMappings(org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getDependencyMappingsWithOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
@@ -246,11 +198,6 @@ public class DependencyServiceImplTest {
         dependencyServiceImpl.getDependencyMappings(options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.dependency.impl.DependencyServiceImpl#getDisconnectedDependencyMappings(org.bonitasoft.engine.dependency.ArtifactAccessor, org.bonitasoft.engine.persistence.QueryOptions)}
-     * .
-     */
     @Test
     public final void getDisconnectedDependencyMappingsNothing() throws SBonitaReadException, SDependencyException {
         final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);

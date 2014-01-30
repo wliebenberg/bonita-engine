@@ -25,6 +25,8 @@ import org.bonitasoft.engine.document.model.SDocument;
  */
 public interface DocumentService {
 
+    String DOCUMENT_CONTENT = "SDocumentContent";
+
     /**
      * Get content for specific document
      * 

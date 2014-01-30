@@ -13,12 +13,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.archive.model.TestLogBuilderFactory;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -176,8 +171,7 @@ public class RecorderTest extends CommonServiceTest {
                 try {
                     txService.begin();
                     final Human human = buildHuman(firstName, "Vaills", 20);
-                    final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
-                    recorder.recordInsert(new InsertRecord(human), insertEvent);
+                    recorder.recordInsert(new InsertRecord(human, HUMAN));
                     foo.insertCompleted = true;
 
                     while (!foo.readCompleted) {
@@ -275,8 +269,7 @@ public class RecorderTest extends CommonServiceTest {
 
         final String firstName = "Laurent";
         final Human human = buildHuman(firstName, "Vaills", 20);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
-        recorder.recordInsert(new InsertRecord(human), insertEvent);
+        recorder.recordInsert(new InsertRecord(human, HUMAN));
 
         // set rollback
         getTransactionService().setRollbackOnly();
@@ -310,10 +303,8 @@ public class RecorderTest extends CommonServiceTest {
 
         final Human humanToUpdate = getHumanByFirstName("firstName");
         assertNotNull(humanToUpdate);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN).setObject(human).done();
-        recorder.recordUpdate(
-                UpdateRecord.buildSetField(humanToUpdate, "firstName", "firstName", "firstNameUpdate", "Update human", HumanRecordType.updateHuman),
-                updateEvent);
+        recorder.recordUpdate(UpdateRecord.buildSetField(humanToUpdate, HUMAN, "firstName", "firstName", "firstNameUpdate", "Update human",
+                HumanRecordType.updateHuman));
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 
@@ -348,8 +339,7 @@ public class RecorderTest extends CommonServiceTest {
 
         final Human humanToDelete = getHumanByFirstName("firstName");
         assertNotNull(humanToDelete);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(HUMAN).setObject(human).done();
-        recorder.recordDelete(new DeleteRecord(humanToDelete), deleteEvent);
+        recorder.recordDelete(new DeleteRecord(humanToDelete, HUMAN));
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 

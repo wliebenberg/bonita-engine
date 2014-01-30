@@ -48,7 +48,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     private final String identifier;
 
     public ArchiveProcessInstancesHandler(final long tenantId) {
-        this(tenantId,  UUID.randomUUID().toString());
+        this(tenantId, UUID.randomUUID().toString());
     }
 
     public ArchiveProcessInstancesHandler(final long tenantId, final String identifier) {
@@ -75,28 +75,23 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
                     logger, commentService, processDefinitionService, connectorInstanceService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new SHandlerExecutionException(e);
         }
     }
 
-    /**
-     * @param serviceAccessorFactory
-     * @return
-     * @throws SHandlerExecutionException
-     */
     private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {
         try {
-            ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
+            final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
             return serviceAccessorFactory.createTenantServiceAccessor(tenantId);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SHandlerExecutionException(e.getMessage(), null);
         }
     }
 
     @Override
     public boolean isInterested(final SUpdateEvent event) {
-        boolean isInterested = ProcessInstanceService.PROCESSINSTANCE_STATE_UPDATED.equals(event.getType()) && event.getObject() instanceof SProcessInstance;
+        boolean isInterested = event.getObject() instanceof SProcessInstance;
         if (isInterested) {
             final SProcessInstance processInstance = (SProcessInstance) event.getObject();
             // TODO add a method isInTerminalState in SProcessInstance

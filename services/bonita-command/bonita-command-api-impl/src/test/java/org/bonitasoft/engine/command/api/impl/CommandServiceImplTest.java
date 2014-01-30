@@ -1,17 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package org.bonitasoft.engine.command.api.impl;
 
 import static org.mockito.Matchers.any;
@@ -25,7 +11,6 @@ import org.bonitasoft.engine.command.SCommandGettingException;
 import org.bonitasoft.engine.command.SCommandNotFoundException;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -49,8 +34,6 @@ public class CommandServiceImplTest {
 
     private ReadPersistenceService persistence;
 
-    private EventService eventService;
-
     private TechnicalLoggerService logger;
 
     private QueriableLoggerService queriableLoggerService;
@@ -61,19 +44,11 @@ public class CommandServiceImplTest {
     public final void setUp() throws Exception {
         recorder = mock(Recorder.class);
         persistence = mock(ReadPersistenceService.class);
-        eventService = mock(EventService.class);
         logger = mock(TechnicalLoggerService.class);
         queriableLoggerService = mock(QueriableLoggerService.class);
-        commandServiceImpl = new CommandServiceImpl(persistence, recorder, eventService, logger, queriableLoggerService);
+        commandServiceImpl = new CommandServiceImpl(persistence, recorder, logger, queriableLoggerService);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getAllCommands(int, int, org.bonitasoft.engine.command.model.SCommandCriterion)}.
-     * 
-     * @throws SCommandGettingException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getAllCommands() throws SCommandGettingException, SBonitaReadException {
         final List<SCommand> sCommands = new ArrayList<SCommand>();
@@ -89,12 +64,6 @@ public class CommandServiceImplTest {
         commandServiceImpl.getAllCommands(0, 1, SCommandCriterion.NAME_DESC);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#get(long)}.
-     * 
-     * @throws SCommandNotFoundException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getById() throws SCommandNotFoundException, SBonitaReadException {
         final SCommand sCommand = mock(SCommand.class);
@@ -117,12 +86,6 @@ public class CommandServiceImplTest {
         commandServiceImpl.get(456L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#get(java.lang.String)}.
-     * 
-     * @throws SCommandNotFoundException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getByName() throws SCommandNotFoundException, SBonitaReadException {
         final SCommand sCommand = mock(SCommand.class);
@@ -145,12 +108,6 @@ public class CommandServiceImplTest {
         commandServiceImpl.get("name");
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getNumberOfCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaSearchException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getNumberOfCommands() throws SBonitaSearchException, SBonitaReadException {
         final long numberOfCommands = 54165L;
@@ -168,13 +125,6 @@ public class CommandServiceImplTest {
         commandServiceImpl.getNumberOfCommands(options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getUserCommands(int, int, org.bonitasoft.engine.command.model.SCommandCriterion)}.
-     * 
-     * @throws SCommandGettingException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getUserCommands() throws SCommandGettingException, SBonitaReadException {
         final List<SCommand> sCommands = new ArrayList<SCommand>();
@@ -190,12 +140,6 @@ public class CommandServiceImplTest {
         commandServiceImpl.getUserCommands(0, 1, SCommandCriterion.NAME_DESC);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#searchCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaSearchException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void searchCommands() throws SBonitaSearchException, SBonitaReadException {
         final List<SCommand> sCommands = new ArrayList<SCommand>();

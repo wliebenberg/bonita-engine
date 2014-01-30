@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -30,12 +30,6 @@ import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.command.model.SCommandLogBuilder;
 import org.bonitasoft.engine.command.model.SCommandLogBuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -72,18 +66,15 @@ public class CommandServiceImpl implements CommandService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public CommandServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    public CommandServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
 
@@ -115,14 +106,10 @@ public class CommandServiceImpl implements CommandService {
             throw new SCommandAlreadyExistsException("Command '" + command.getName() + "' already exists");
         } catch (final SCommandNotFoundException scmfe) {
             final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new command with name " + command.getName());
-            final InsertRecord insertRecord = new InsertRecord(command);
+            final InsertRecord insertRecord = new InsertRecord(command, COMMAND);
 
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMAND, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMAND).setObject(command).done();
-            }
             try {
-                recorder.recordInsert(insertRecord, insertEvent);
+                recorder.recordInsert(insertRecord);
                 initiateLogBuilder(command.getId(), SQueriableLog.STATUS_OK, logBuilder, "create");
                 if (isTraceEnable) {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "create"));
@@ -145,13 +132,9 @@ public class CommandServiceImpl implements CommandService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "delete"));
         }
         final SCommand command = this.get(commandName);
-        final DeleteRecord deleteRecord = new DeleteRecord(command);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(COMMAND, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMAND).setObject(command).done();
-        }
+        final DeleteRecord deleteRecord = new DeleteRecord(command, COMMAND);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(deleteRecord);
             if (isTraceEnable) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "delete"));
             }
@@ -254,15 +237,10 @@ public class CommandServiceImpl implements CommandService {
         final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating command with name " + command.getName());
 
         final SCommandBuilderFactory fact = BuilderFactory.get(SCommandBuilderFactory.class);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(command, updateDescriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(COMMAND, EventActionType.UPDATED)) {
-            final SCommand oldCommand = fact.createNewInstance(command).done();
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(COMMAND).setObject(command).done();
-            updateEvent.setOldObject(oldCommand);
-        }
+        final SCommand oldCommand = fact.createNewInstance(command).done();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(command, COMMAND, oldCommand, updateDescriptor);
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord);
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "update"));
             }
@@ -332,13 +310,9 @@ public class CommandServiceImpl implements CommandService {
         }
         final SCommandLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting command with id " + commandId);
         final SCommand command = this.get(commandId);
-        final DeleteRecord deleteRecord = new DeleteRecord(command);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(COMMAND, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMAND).setObject(command).done();
-        }
+        final DeleteRecord deleteRecord = new DeleteRecord(command, COMMAND);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(deleteRecord);
             if (isTraceEnable) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "delete"));
             }

@@ -159,7 +159,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         if (!sDataInstance.isTransientData()) {
             try {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
-                final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
+                final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance, DataInstanceDataSource.DATA_INSTANCE);
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
             } catch (final SDefinitiveArchiveNotFound e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
@@ -419,7 +419,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      * @throws SDataInstanceException
      */
     private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
-        final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
+        final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping, DATA_VISIBILITY_MAPPING);
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
         try {
             recorder.recordDelete(record, deleteEvent);
@@ -477,13 +477,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long archiveDate) throws SRecorderException, SDefinitiveArchiveNotFound {
         final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
-        final InsertRecord record = new InsertRecord(mapping);
+        final InsertRecord record = new InsertRecord(mapping, DATA_VISIBILITY_MAPPING);
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();
         recorder.recordInsert(record, insertEvent);
         // add archived mapping also because when the data change the archive mapping will be used to retrieve old value
         final SADataInstanceVisibilityMapping archivedMapping = BuilderFactory.get(SADataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
-        archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
+        archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping, DATA_VISIBILITY_MAPPING));
         return mapping;
     }
 
@@ -709,7 +709,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     @Override
     public void deleteSADataInstance(final SADataInstance dataInstance) throws SDeleteDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
+        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance, DataInstanceDataSource.DATA_INSTANCE);
         final SEvent event = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DataInstanceDataSource.DATA_INSTANCE).setObject(dataInstance)
                 .done();
         final SDeleteEvent deleteEvent = (SDeleteEvent) event;

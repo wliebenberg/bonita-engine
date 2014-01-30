@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.theme.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -27,11 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -71,9 +53,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ThemeServiceImplTest {
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private TechnicalLoggerService logger;
 
     @Mock
@@ -88,19 +67,12 @@ public class ThemeServiceImplTest {
     @InjectMocks
     private ThemeServiceImpl themeServiceImpl;
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#createTheme(org.bonitasoft.engine.theme.model.STheme)}.
-     * 
-     * @throws SThemeCreationException
-     * @throws SRecorderException
-     */
     @Test
     public final void createTheme() throws SThemeCreationException, SRecorderException {
         final STheme sTheme = mock(STheme.class);
         doReturn(1L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final STheme result = themeServiceImpl.createTheme(sTheme);
@@ -118,29 +90,19 @@ public class ThemeServiceImplTest {
         final STheme sTheme = mock(STheme.class);
         doReturn(1L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         themeServiceImpl.createTheme(sTheme);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(long)}.
-     * 
-     * @throws SThemeDeletionException
-     * @throws SThemeNotFoundException
-     * @throws SRecorderException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void deleteThemeById() throws SThemeNotFoundException, SThemeDeletionException, SRecorderException, SBonitaReadException {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         themeServiceImpl.deleteTheme(1);
@@ -159,25 +121,17 @@ public class ThemeServiceImplTest {
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         themeServiceImpl.deleteTheme(1);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(org.bonitasoft.engine.theme.model.STheme)}.
-     * 
-     * @throws SRecorderException
-     * @throws SThemeDeletionException
-     */
     @Test
     public final void deleteThemeByObject() throws SRecorderException, SThemeDeletionException {
         final STheme sTheme = mock(STheme.class);
         doReturn(3L).when(sTheme).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         themeServiceImpl.deleteTheme(sTheme);
@@ -194,19 +148,11 @@ public class ThemeServiceImplTest {
         doReturn(3L).when(sTheme).getId();
 
         doReturn(sTheme).when(persistenceService).selectById(Matchers.<SelectByIdDescriptor<STheme>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         themeServiceImpl.deleteTheme(sTheme);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#restoreDefaultTheme(SThemeType)}.
-     * 
-     * @throws SRestoreThemeException
-     * @throws SRecorderException
-     * 
-     */
     @Test
     public final void restoreDefaultTheme() throws SRestoreThemeException, SRecorderException {
         doNothing().when(recorder).recordDeleteAll(any(DeleteAllRecord.class));
@@ -221,13 +167,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.restoreDefaultTheme(SThemeType.PORTAL);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getCurrentTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
-     * @throws SThemeNotFoundException
-     * @throws SBonitaReadException
-     * @throws SThemeReadException
-     */
     @Test
     public final void getCurrentTheme() throws SThemeNotFoundException, SBonitaReadException, SThemeReadException {
         final STheme sTheme = mock(STheme.class);
@@ -256,13 +195,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getTheme(type, false);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getDefaultTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SThemeNotFoundException
-     * @throws SThemeReadException
-     */
     @Test
     public final void getDefaultTheme() throws SBonitaReadException, SThemeNotFoundException, SThemeReadException {
         final STheme sTheme = mock(STheme.class);
@@ -291,9 +223,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getTheme(type, true);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getTheme(long)}.
-     */
     @Test
     public void getThemeById() throws Exception {
         final STheme sTheme = mock(STheme.class);
@@ -317,13 +246,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getTheme(1);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getLastModifiedTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SThemeNotFoundException
-     * @throws SThemeReadException
-     */
     @Test
     public final void getLastModifiedTheme() throws SBonitaReadException, SThemeNotFoundException, SThemeReadException {
         final STheme sTheme = mock(STheme.class);
@@ -352,9 +274,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getLastModifiedTheme(type);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getNumberOfThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void getNumberOfThemesWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -371,9 +290,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.getNumberOfThemes(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#searchThemes(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void searchThemesWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -390,14 +306,6 @@ public class ThemeServiceImplTest {
         themeServiceImpl.searchThemes(options);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#updateTheme(org.bonitasoft.engine.theme.model.STheme, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * 
-     * @throws SBonitaReadException
-     * @throws SRecorderException
-     * @throws SThemeUpdateException
-     */
     @Test
     public final void updateTheme() throws SThemeUpdateException {
         final STheme sTheme = mock(STheme.class);
@@ -405,7 +313,6 @@ public class ThemeServiceImplTest {
         final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final STheme result = themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
@@ -435,7 +342,7 @@ public class ThemeServiceImplTest {
         final SThemeUpdateBuilder sThemeUpdateBuilder = BuilderFactory.get(SThemeUpdateBuilderFactory.class).createNewInstance();
         sThemeUpdateBuilder.setType(SThemeType.MOBILE);
 
-        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordUpdate(any(UpdateRecord.class));
 
         themeServiceImpl.updateTheme(sTheme, sThemeUpdateBuilder.done());
     }

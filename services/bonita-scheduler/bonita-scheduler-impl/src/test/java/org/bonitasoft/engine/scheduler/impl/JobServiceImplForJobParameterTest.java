@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -29,10 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -65,9 +48,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class JobServiceImplForJobParameterTest {
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
     @Mock
@@ -79,12 +59,6 @@ public class JobServiceImplForJobParameterTest {
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameters(java.util.List, long, long)}.
-     * 
-     * @throws SJobParameterCreationException
-     * @throws SRecorderException
-     */
     @Test
     public final void createJobParameters() throws SJobParameterCreationException, SRecorderException {
         final long tenantId = 2;
@@ -92,8 +66,7 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(1L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final List<SJobParameter> result = jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
@@ -129,20 +102,12 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(1L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.createJobParameters(Collections.singletonList(sJobParameter), tenantId, jobDescriptorId);
     }
 
-    /**
-     * method for
-     * {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter, long, long)}.
-     * 
-     * @throws SJobParameterCreationException
-     * @throws SRecorderException
-     */
     @Test
     public final void createJobParameter() throws SJobParameterCreationException, SRecorderException {
         final long tenantId = 2;
@@ -150,8 +115,7 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(1L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SJobParameter result = jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
@@ -174,22 +138,12 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(1L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.createJobParameter(sJobParameter, tenantId, jobDescriptorId);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobParameter(long)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SRecorderException
-     * @throws SJobParameterDeletionException
-     * @throws SJobParameterReadException
-     * @throws SJobParameterNotFoundException
-     */
     @Test
     public final void deleteJobParameterById() throws SBonitaReadException, SRecorderException, SJobParameterNotFoundException, SJobParameterReadException,
             SJobParameterDeletionException {
@@ -197,8 +151,7 @@ public class JobServiceImplForJobParameterTest {
         doReturn(3L).when(sJobParameter).getId();
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.deleteJobParameter(3);
@@ -218,25 +171,17 @@ public class JobServiceImplForJobParameterTest {
         doReturn(3L).when(sJobParameter).getId();
 
         doReturn(sJobParameter).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobParameter>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         jobServiceImpl.deleteJobParameter(3);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobParameter(org.bonitasoft.engine.scheduler.model.SJobParameter)}.
-     * 
-     * @throws SRecorderException
-     * @throws SJobParameterDeletionException
-     */
     @Test
     public final void deleteJobParameterByObject() throws SRecorderException, SJobParameterDeletionException {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(3L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
@@ -252,19 +197,11 @@ public class JobServiceImplForJobParameterTest {
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         doReturn(3L).when(sJobParameter).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         jobServiceImpl.deleteJobParameter(sJobParameter);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getJobParameter(long)}.
-     * 
-     * @throws SJobParameterReadException
-     * @throws SJobParameterNotFoundException
-     * @throws SBonitaReadException
-     */
     @Test
     public void getJobParameterById() throws SJobParameterNotFoundException, SJobParameterReadException, SBonitaReadException {
         final long jobParameterId = 1;
@@ -292,12 +229,6 @@ public class JobServiceImplForJobParameterTest {
         jobServiceImpl.getJobParameter(jobParameterId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#searchJobParameters(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     */
     @Test
     public void searchJobParameters() throws SBonitaSearchException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -315,14 +246,6 @@ public class JobServiceImplForJobParameterTest {
         jobServiceImpl.searchJobParameters(options);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#setJobParameters(long, long, java.util.List)}.
-     * 
-     * @throws SJobParameterCreationException
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     * @throws SRecorderException
-     */
     @Test
     public final void setJobParameters() throws SJobParameterCreationException, SBonitaSearchException, SBonitaReadException, SRecorderException {
         final long tenantId = 12;
@@ -331,9 +254,8 @@ public class JobServiceImplForJobParameterTest {
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final List<SJobParameter> result = jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
@@ -388,8 +310,7 @@ public class JobServiceImplForJobParameterTest {
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
@@ -404,11 +325,11 @@ public class JobServiceImplForJobParameterTest {
 
         doReturn(Collections.singletonList(sJobParameter)).when(readPersistenceService).searchEntity(eq(SJobParameter.class), any(QueryOptions.class),
                 eq((Map<String, Object>) null));
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.setJobParameters(tenantId, jobDescriptorId, Collections.singletonList(sJobParameter));
     }
+
 }

@@ -62,6 +62,8 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
 
     String HIDDEN_TASK = "HIDDENTASK";
 
+    String ACTIVITYINSTANCE_ASSIGNEE = "ACTIVITYINSTANCE_ASSIGNEE";
+
     /**
      * Create activityInstance in DB according to the given activityInstance object
      * 

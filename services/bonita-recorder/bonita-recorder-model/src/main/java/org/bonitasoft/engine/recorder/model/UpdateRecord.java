@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,42 +24,50 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public final class UpdateRecord extends Record {
+public final class UpdateRecord extends AbstractRecord {
 
     private Map<String, Object> fields;
 
     private final Object oldValue;
 
-    public static UpdateRecord buildSetFields(final PersistentObject entity, final Map<String, Object> fields) {
-        final UpdateRecord updateRecord = new UpdateRecord(entity, null);
+    public static UpdateRecord buildSetFields(final PersistentObject entity, final String entityType, final Map<String, Object> fields) {
+        final UpdateRecord updateRecord = new UpdateRecord(entity, entityType, null);
         updateRecord.addFields(fields);
         return updateRecord;
     }
 
-    public static UpdateRecord buildSetFields(final PersistentObject entity, final EntityUpdateDescriptor descriptor) {
+    public static UpdateRecord buildSetFields(final PersistentObject entity, final String entityType, final EntityUpdateDescriptor descriptor) {
         NullCheckingUtil.checkArgsNotNull(descriptor);
-        final UpdateRecord updateRecord = new UpdateRecord(entity, null);
+        final UpdateRecord updateRecord = new UpdateRecord(entity, entityType, null);
         updateRecord.addFields(descriptor.getFields());
         return updateRecord;
     }
 
-    public static UpdateRecord buildSetField(final PersistentObject entity, final String fieldName, final Object fieldValue, final Object oldValue,
-            final String message, final Enum<?> recordType, final Long... parentIds) {
-        final UpdateRecord updateRecord = new UpdateRecord(entity, oldValue);
+    public static UpdateRecord buildSetFields(final PersistentObject entity, final String entityType, final PersistentObject oldEntity,
+            final EntityUpdateDescriptor descriptor) {
+        NullCheckingUtil.checkArgsNotNull(descriptor);
+        final UpdateRecord updateRecord = new UpdateRecord(entity, entityType, oldEntity);
+        updateRecord.addFields(descriptor.getFields());
+        return updateRecord;
+    }
+
+    public static UpdateRecord buildSetField(final PersistentObject entity, final String entityType, final String fieldName, final Object fieldValue,
+            final Object oldValue, final String message, final Enum<?> recordType, final Long... parentIds) {
+        final UpdateRecord updateRecord = new UpdateRecord(entity, entityType, oldValue);
         updateRecord.addField(fieldName, fieldValue);
         return updateRecord;
     }
 
-    private UpdateRecord(final PersistentObject entity, final Object oldValue) {
-        super(entity);
+    private UpdateRecord(final PersistentObject entity, final String entityType, final Object oldValue) {
+        super(entity, entityType);
         this.oldValue = oldValue;
     }
 
     public void addField(final String fieldName, final Object fieldValue) {
-        if (this.fields == null) {
-            this.fields = new HashMap<String, Object>();
+        if (fields == null) {
+            fields = new HashMap<String, Object>();
         }
-        this.fields.put(fieldName, fieldValue);
+        fields.put(fieldName, fieldValue);
     }
 
     public void addFields(final Map<String, Object> fields) {

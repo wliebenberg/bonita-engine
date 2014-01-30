@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
 import org.bonitasoft.engine.core.process.instance.model.builder.STokenBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -44,6 +39,7 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 /**
  * @author Celine Souchet
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class TokenServiceImpl implements TokenService {
 
@@ -51,29 +47,20 @@ public class TokenServiceImpl implements TokenService {
 
     private final ReadPersistenceService persistenceRead;
 
-    private final EventService eventService;
-
     private final TechnicalLoggerService logger;
 
-    public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
-            final EventService eventService, final TechnicalLoggerService logger) {
+    public TokenServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead, final TechnicalLoggerService logger) {
         this.recorder = recorder;
         this.persistenceRead = persistenceRead;
-        this.eventService = eventService;
         this.logger = logger;
-
     }
 
     @Override
     public SToken createToken(final Long processInstanceId, final Long refId, final Long parentRefId) throws SObjectCreationException {
         final SToken token = BuilderFactory.get(STokenBuilderFactory.class).createNewInstance(processInstanceId, refId, parentRefId).done();
-        final InsertRecord insertRecord = new InsertRecord(token);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(token, PROCESS_INSTANCE_TOKEN_COUNT);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
         } catch (final SRecorderException sre) {
             throw new SObjectCreationException(sre);
         }
@@ -108,12 +95,8 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void deleteToken(final SToken token) throws SObjectModificationException {
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(token);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(PROCESS_INSTANCE_TOKEN_COUNT, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PROCESS_INSTANCE_TOKEN_COUNT).setObject(token).done();
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(token, PROCESS_INSTANCE_TOKEN_COUNT);
+            recorder.recordDelete(deleteRecord);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "deleted token:id=" + token.getId() + ", pId=" + token.getProcessInstanceId()
                         + ", refId=" + token.getRefId() + ", parentRefId=" + token.getParentRefId());

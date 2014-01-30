@@ -66,7 +66,7 @@ public class RecorderImpl implements Recorder {
         try {
             final PersistentObject entity = record.getEntity();
             persistenceService.insert(entity);
-            final String eventType = entity.getClass().getName();
+            final String eventType = record.getEntityType();
             if (eventService.hasHandlers(eventType, EventActionType.CREATED)) {
                 final SEvent sEvent = BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(eventType).setObject(entity).done();
                 eventService.fireEvent(sEvent);
@@ -120,12 +120,12 @@ public class RecorderImpl implements Recorder {
         traceBeforeMethod(methodName);
         try {
             final PersistentObject entity = record.getEntity();
-            persistenceService.delete(record.getEntity());
-            final String eventType = entity.getClass().getName();
+            final String eventType = record.getEntityType();
             if (eventService.hasHandlers(eventType, EventActionType.DELETED)) {
                 final SEvent sEvent = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(entity).done();
                 eventService.fireEvent(sEvent);
             }
+            persistenceService.delete(entity);
             traceAfterMethod(methodName);
         } catch (final FireEventException fee) {
             logFireEventExceptionAndThrowSRecorderException(fee, methodName);
@@ -174,9 +174,10 @@ public class RecorderImpl implements Recorder {
         final UpdateDescriptor desc = UpdateDescriptor.buildSetFields(entity, record.getFields());
         try {
             persistenceService.update(desc);
-            final String eventType = entity.getClass().getName();
+            final String eventType = record.getEntityType();
             if (eventService.hasHandlers(eventType, EventActionType.UPDATED)) {
-                final SEvent sEvent = BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(entity).done();
+                final SUpdateEvent sEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(entity).done();
+                sEvent.setOldObject(record.getOldValue());
                 eventService.fireEvent(sEvent);
             }
             traceAfterMethod(methodName);

@@ -1,19 +1,5 @@
 package org.bonitasoft.engine.core.category.impl;
 
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -25,7 +11,6 @@ import java.util.List;
 import org.bonitasoft.engine.core.category.exception.SCategoryException;
 import org.bonitasoft.engine.core.category.exception.SCategoryNotFoundException;
 import org.bonitasoft.engine.core.category.model.SCategory;
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -55,9 +40,6 @@ public class CategoryServiceImplTest {
     private ReadPersistenceService persistenceService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
     @Mock
@@ -74,12 +56,6 @@ public class CategoryServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategory(long)}.
-     * 
-     * @throws SCategoryNotFoundException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getCategoryById() throws SCategoryNotFoundException, SBonitaReadException {
         final SCategory sCategory = mock(SCategory.class);
@@ -102,14 +78,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getCategory(456L);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategories(int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getCategories() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
@@ -125,14 +93,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getCategories(0, 1, "field", OrderByType.ASC);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoriesOfProcessDefinition(long, int, int, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getCategoriesOfProcessDefinition() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
@@ -148,12 +108,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getCategoriesOfProcessDefinition(2L, 0, 1, OrderByType.ASC);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategorizedProcessIds(java.util.List)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getCategorizedProcessIds() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
@@ -183,12 +137,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getCategorizedProcessIds(processIds);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoryByName(java.lang.String)}.
-     * 
-     * @throws SCategoryNotFoundException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getCategoryByName() throws SCategoryNotFoundException, SBonitaReadException {
         final SCategory sCategory = mock(SCategory.class);
@@ -211,12 +159,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getCategoryByName("name");
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategories()}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SCategoryException
-     */
     @Test
     public final void getNumberOfCategories() throws SBonitaReadException, SCategoryException {
         final long numberOfCategories = 3L;
@@ -232,12 +174,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getNumberOfCategories();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesOfProcess(long)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getNumberOfCategoriesOfProcess() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
@@ -253,12 +189,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getNumberOfCategoriesOfProcess(1589L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategoriesUnrelatedToProcess(long)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getNumberOfCategoriesUnrelatedToProcess() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
@@ -274,12 +204,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getNumberOfCategoriesUnrelatedToProcess(1589L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getNumberOfCategorizedProcessIds(java.util.List)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getNumberOfCategorizedProcessIds() throws SCategoryException, SBonitaReadException {
         final long numberOfCategories = 3L;
@@ -309,12 +233,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getNumberOfCategorizedProcessIds(processIds);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getProcessDefinitionIdsOfCategory(long)}.
-     * 
-     * @throws SCategoryException
-     * @throws SBonitaReadException
-     */
     @Test
     public final void getProcessDefinitionIdsOfCategory() throws SCategoryException, SBonitaReadException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();
@@ -330,11 +248,6 @@ public class CategoryServiceImplTest {
         categoryServiceImpl.getProcessDefinitionIdsOfCategory(54894L);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.core.category.impl.CategoryServiceImpl#getCategoriesUnrelatedToProcessDefinition(long, int, int, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     */
     @Test
     public final void getCategoriesUnrelatedToProcessDefinition() throws SBonitaReadException, SCategoryException {
         final List<SCategory> sCategories = new ArrayList<SCategory>();

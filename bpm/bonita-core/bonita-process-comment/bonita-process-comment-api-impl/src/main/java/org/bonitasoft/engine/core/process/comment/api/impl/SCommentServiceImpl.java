@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,11 +31,6 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SHumanCommentBuilderFactory;
 import org.bonitasoft.engine.core.process.comment.model.builder.SSystemCommentBuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -79,30 +74,17 @@ public class SCommentServiceImpl implements SCommentService {
 
     private final Map<SystemCommentType, Boolean> systemCommentType;
 
-    private final EventService eventService;
-
     private final ArchiveService archiveService;
 
-    public SCommentServiceImpl(final Recorder recorder,
-            final ReadPersistenceService persistenceService, final ArchiveService archiveService, final SessionService sessionService,
-            final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType,
-            final EventService eventService) {
+    public SCommentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final ArchiveService archiveService,
+            final SessionService sessionService, final ReadSessionAccessor sessionAccessor, final Map<SystemCommentType, Boolean> systemCommentType) {
         super();
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
         this.systemCommentType = systemCommentType;
-        this.eventService = eventService;
         this.archiveService = archiveService;
-    }
-
-    private SInsertEvent getInsertEvent(final Object obj) {
-        return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(COMMENT).setObject(obj).done();
-    }
-
-    private SDeleteEvent getDeleteEvent(final Object obj) {
-        return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(COMMENT).setObject(obj).done();
     }
 
     @Override
@@ -144,12 +126,8 @@ public class SCommentServiceImpl implements SCommentService {
         try {
             final long userId = getUserId();
             final SComment sComment = BuilderFactory.get(SHumanCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, userId).done();
-            final InsertRecord insertRecord = new InsertRecord(sComment);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
-                insertEvent = getInsertEvent(sComment);
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            final InsertRecord insertRecord = new InsertRecord(sComment, COMMENT);
+            recorder.recordInsert(insertRecord);
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException("Imposible to create comment.", e);
@@ -162,12 +140,8 @@ public class SCommentServiceImpl implements SCommentService {
     public void delete(final SComment comment) throws SCommentDeletionException {
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(comment);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.DELETED)) {
-                deleteEvent = getDeleteEvent(comment);
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(comment, COMMENT);
+            recorder.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw new SCommentDeletionException("Imposible to delete comment.", e);
         }
@@ -190,7 +164,7 @@ public class SCommentServiceImpl implements SCommentService {
         long sessionId;
         try {
             sessionId = sessionAccessor.getSessionId();
-        } catch (SessionIdNotSetException e) {
+        } catch (final SessionIdNotSetException e) {
             // system
             return -1;
         }
@@ -284,12 +258,8 @@ public class SCommentServiceImpl implements SCommentService {
         NullCheckingUtil.checkArgsNotNull(comment);
         try {
             final SComment sComment = BuilderFactory.get(SSystemCommentBuilderFactory.class).createNewInstance(processInstanceId, comment, null).done();
-            final InsertRecord insertRecord = new InsertRecord(sComment);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(COMMENT, EventActionType.CREATED)) {
-                insertEvent = getInsertEvent(sComment);
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            final InsertRecord insertRecord = new InsertRecord(sComment, COMMENT);
+            recorder.recordInsert(insertRecord);
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException("Imposible to create system comment.", e);
@@ -317,18 +287,19 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteArchivedComments(final long processInstanceId) throws SBonitaException {
-        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getProcessInstanceIdKey(),
-                processInstanceId));
-        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class).getIdKey(),
-                OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SAComment.class, BuilderFactory.get(SACommentBuilderFactory.class)
+                .getProcessInstanceIdKey(), processInstanceId));
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SAComment.class, BuilderFactory.get(
+                SACommentBuilderFactory.class).getIdKey(), OrderByType.ASC));
         List<SAComment> searchArchivedComments = null;
         // fromIndex always will be zero because the elements will be deleted
         final QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, filters, null);
         do {
             searchArchivedComments = searchArchivedComments(queryOptions);
             for (final SAComment saComment : searchArchivedComments) {
-                archiveService.recordDelete(new DeleteRecord(saComment));
+                archiveService.recordDelete(new DeleteRecord(saComment, COMMENT));
             }
         } while (!searchArchivedComments.isEmpty());
     }
+
 }

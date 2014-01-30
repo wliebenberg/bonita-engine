@@ -23,10 +23,5 @@
 			<artifactId>bonita-log-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.identity</groupId>
-			<artifactId>bonita-identity-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,12 +31,6 @@ import org.bonitasoft.engine.core.process.document.mapping.model.archive.builder
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingUpdateBuilder;
 import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingUpdateBuilderFactory;
 import org.bonitasoft.engine.core.process.document.mapping.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -68,29 +62,22 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final ArchiveService archiveService;
 
     public DocumentMappingServiceImpl(final TechnicalLoggerService technicalLogger, final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final ArchiveService archiveService) {
+            final ArchiveService archiveService) {
         super();
         this.technicalLogger = technicalLogger;
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.archiveService = archiveService;
     }
 
     @Override
     public SDocumentMapping create(final SDocumentMapping documentMapping) throws SDocumentMappingCreationException {
         try {
-            final InsertRecord insertRecord = new InsertRecord(documentMapping);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            final InsertRecord insertRecord = new InsertRecord(documentMapping, DOCUMENTMAPPING);
+            recorder.recordInsert(insertRecord);
             return documentMapping;
         } catch (final SRecorderException e) {
             throw new SDocumentMappingCreationException(e);
@@ -100,12 +87,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     @Override
     public void delete(final SDocumentMapping documentMapping) throws SDocumentMappingDeletionException {
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(documentMapping, DOCUMENTMAPPING);
+            recorder.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw handleDeletionError("can't delete Document Mapping " + documentMapping, e);
         }
@@ -220,7 +203,7 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     private void archiveOldMappingIfNecessary(final SDocumentMapping docMapping, final long archiveDate) throws SDocumentMappingException {
         if (archiveService.isArchivable(SDocumentMapping.class)) {
             final SADocumentMapping sArchivedDocumentMapping = buildMappingToArchive(docMapping);
-            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(sArchivedDocumentMapping);
+            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(sArchivedDocumentMapping, DOCUMENTMAPPING);
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
             } catch (final Exception e) {
@@ -249,13 +232,9 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     }
 
     private SDocumentMapping updateMapping(final SDocumentMapping docMapping, final EntityUpdateDescriptor descriptor) throws SDocumentMappingException {
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(docMapping, descriptor);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(docMapping, DOCUMENTMAPPING, descriptor);
         try {
-            SUpdateEvent updateEvent = null;
-            if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENTMAPPING).setObject(docMapping).done();
-            }
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord);
             return docMapping;
         } catch (final SRecorderException e) {
             throw new SDocumentMappingException("Impossible to update document. ", e);
@@ -373,12 +352,8 @@ public class DocumentMappingServiceImpl implements DocumentMappingService {
     @Override
     public void delete(final SADocumentMapping documentMapping) throws SDocumentMappingDeletionException {
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(documentMapping);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DOCUMENTMAPPING).setObject(documentMapping).done();
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(documentMapping, DOCUMENTMAPPING);
+            recorder.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw handleDeletionError("can't delete archived Document Mapping " + documentMapping, e);
         }

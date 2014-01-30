@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,10 +15,13 @@ package org.bonitasoft.engine.recorder.model;
 
 import org.bonitasoft.engine.persistence.PersistentObject;
 
-public class DeleteRecord extends Record {
+/**
+ * @author Matthieu Chaffotte
+ */
+public class DeleteRecord extends AbstractRecord {
 
-    public DeleteRecord(final PersistentObject entity) {
-        super(entity);
+    public DeleteRecord(final PersistentObject entity, final String entityType) {
+        super(entity, entityType);
     }
 
 }

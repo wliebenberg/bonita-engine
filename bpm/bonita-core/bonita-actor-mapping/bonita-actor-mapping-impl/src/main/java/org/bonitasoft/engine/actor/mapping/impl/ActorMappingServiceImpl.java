@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,12 +34,6 @@ import org.bonitasoft.engine.actor.mapping.model.SActorMember;
 import org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl;
 import org.bonitasoft.engine.actor.mapping.persistence.SelectDescriptorBuilder;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -80,17 +74,14 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final QueriableLoggerService queriableLoggerService;
 
     private final IdentityService identityService;
 
-    public ActorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public ActorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService, final IdentityService identityService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
         this.identityService = identityService;
     }
@@ -107,13 +98,9 @@ public class ActorMappingServiceImpl implements ActorMappingService {
     @Override
     public SActor addActor(final SActor actor) throws SActorCreationException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new actor");
-        final InsertRecord insertRecord = new InsertRecord(actor);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(ACTOR, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTOR).setObject(actor).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(actor, ACTOR);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
             initiateLogBuilder(actor.getId(), SQueriableLog.STATUS_OK, logBuilder, "addActor");
             return actor;
         } catch (final SRecorderException re) {
@@ -214,13 +201,9 @@ public class ActorMappingServiceImpl implements ActorMappingService {
             SBonitaReadException {
         final SActor actor = getActor(actorId);
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating an actor");
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(actor, descriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(ACTOR, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTOR).setObject(actor).done();
-        }
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(actor, ACTOR, descriptor);
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord);
             initiateLogBuilder(actorId, SQueriableLog.STATUS_OK, logBuilder, "updateActor");
         } catch (final SRecorderException e) {
             initiateLogBuilder(actorId, SQueriableLog.STATUS_FAIL, logBuilder, "updateActor");
@@ -255,13 +238,9 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     private void deleteActor(final SActor actor) throws SActorDeletionException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting an actor");
-        final DeleteRecord deleteRecord = new DeleteRecord(actor);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(ACTOR, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ACTOR).setObject(actor).done();
-        }
+        final DeleteRecord deleteRecord = new DeleteRecord(actor, ACTOR);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(deleteRecord);
             initiateLogBuilder(actor.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteActor");
         } catch (final SRecorderException re) {
             initiateLogBuilder(actor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "deleteActor");
@@ -285,13 +264,9 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     private SActorMember addActorMember(final SActorMemberImpl actorMember) throws SActorMemberCreationException {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new actor member");
-        final InsertRecord insertRecord = new InsertRecord(actorMember);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(ACTOR_MEMBER, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ACTOR_MEMBER).setObject(actorMember).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(actorMember, ACTOR_MEMBER);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
             initiateLogBuilder(actorMember.getId(), SQueriableLog.STATUS_OK, logBuilder, "addActorMember");
             return actorMember;
         } catch (final SRecorderException re) {
@@ -385,12 +360,8 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting an actor member");
         final long actorMemberId = sActorMember.getId();
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(sActorMember);
-            SDeleteEvent deleteEvent = null;
-            if (eventService.hasHandlers(ACTOR_MEMBER, EventActionType.DELETED)) {
-                deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ACTOR_MEMBER).setObject(sActorMember).done();
-            }
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(sActorMember, ACTOR_MEMBER);
+            recorder.recordDelete(deleteRecord);
             initiateLogBuilder(actorMemberId, SQueriableLog.STATUS_OK, logBuilder, "removeActorMember");
         } catch (final SRecorderException re) {
             initiateLogBuilder(actorMemberId, SQueriableLog.STATUS_FAIL, logBuilder, "removeActorMember");

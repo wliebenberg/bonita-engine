@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,12 +22,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -66,6 +60,7 @@ import org.bonitasoft.engine.theme.persistence.SelectDescriptorBuilder;
 
 /**
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ThemeServiceImpl implements ThemeService {
 
@@ -73,18 +68,15 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
 
-    public ThemeServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    public ThemeServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
     }
@@ -93,13 +85,9 @@ public class ThemeServiceImpl implements ThemeService {
     public STheme createTheme(final STheme theme) throws SThemeCreationException {
         logBeforeMethod("createTheme");
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.CREATED, "Adding a new theme");
-        final InsertRecord insertRecord = new InsertRecord(theme);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(THEME).setObject(theme).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(theme, THEME);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
             initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, "createTheme");
             logAfterMethod("createTheme");
             return theme;
@@ -127,13 +115,9 @@ public class ThemeServiceImpl implements ThemeService {
     public void deleteTheme(final STheme theme) throws SThemeDeletionException {
         logBeforeMethod("deleteTheme");
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.DELETED, "Deleting theme");
-        final DeleteRecord deleteRecord = new DeleteRecord(theme);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(THEME).setObject(theme).done();
-        }
+        final DeleteRecord deleteRecord = new DeleteRecord(theme, THEME);
         try {
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            recorder.recordDelete(deleteRecord);
             initiateLogBuilder(theme.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteTheme");
             logAfterMethod("deleteTheme");
         } catch (final SRecorderException re) {
@@ -208,15 +192,10 @@ public class ThemeServiceImpl implements ThemeService {
         logBeforeMethod("updateTheme");
         NullCheckingUtil.checkArgsNotNull(sTheme);
         final SThemeLogBuilderImpl logBuilder = getSThemeLog(ActionType.UPDATED, "Updating theme");
-        final STheme oldUser = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(sTheme).done();
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTheme, descriptor);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(THEME, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(THEME).setObject(sTheme).done();
-            updateEvent.setOldObject(oldUser);
-        }
+        final STheme oldTheme = BuilderFactory.get(SThemeBuilderFactory.class).createNewInstance(sTheme).done();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTheme, THEME, oldTheme, descriptor);
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord);
             initiateLogBuilder(sTheme.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateTheme");
             logAfterMethod("updateTheme");
         } catch (final SRecorderException re) {

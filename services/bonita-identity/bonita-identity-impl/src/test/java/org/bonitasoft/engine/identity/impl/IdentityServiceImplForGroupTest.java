@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.identity.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.SGroupNotFoundException;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -54,9 +40,6 @@ public class IdentityServiceImplForGroupTest {
     private ReadPersistenceService persistenceService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private TechnicalLoggerService logger;
 
     @InjectMocks
@@ -67,9 +50,6 @@ public class IdentityServiceImplForGroupTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfGroupChildren(long)}.
-     */
     @Test
     public void getNumberOfGroupChildren() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -90,9 +70,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getNumberOfGroupChildren(123l);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupChildren(long)}.
-     */
     @Test
     public void getGroupChildrenById() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -112,9 +89,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroupChildren(123l);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupChildren(long, int, int)}.
-     */
     @Test
     public void getGroupChildrenPaginatedById() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -134,11 +108,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroupChildren(123l, 0, 10);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupChildren(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     * .
-     */
     @Test
     public void getGroupChildrenPaginatedByIdWithOrder() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -160,9 +129,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroupChildren(123l, 0, 10, "name", OrderByType.ASC);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfGroups(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void getNumberOfGroupsWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -179,9 +145,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getNumberOfGroups(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfGroups()}.
-     */
     @Test
     public void getNumberOfGroups() throws Exception {
         when(persistenceService.selectOne(SelectDescriptorBuilder.getNumberOfElement("SGroup", SGroup.class))).thenReturn(125l);
@@ -196,9 +159,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getNumberOfGroups();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#searchGroups(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void searchGroups() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -216,9 +176,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.searchGroups(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroup(long)}.
-     */
     @Test
     public void getGroup() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -241,9 +198,6 @@ public class IdentityServiceImplForGroupTest {
         assertEquals(group, identityServiceImpl.getGroup(123l));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupsByName(java.lang.String)}.
-     */
     @Test
     public void getGroupsByName() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -259,9 +213,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroupsByName("name");
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroupByPath(java.lang.String)}.
-     */
     @Test
     public void getGroupByPath() throws Exception {
         final SGroup group = mock(SGroup.class);
@@ -300,9 +251,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroupByPath("path");
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroups(java.util.List)}.
-     */
     @Test
     public final void getGroupsByIds() throws SBonitaReadException, SGroupNotFoundException {
         final SGroup group = mock(SGroup.class);
@@ -330,9 +278,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroups(Arrays.asList(123l));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroups(int, int)}.
-     */
     @Test
     public final void getGroupsPaginated() throws SBonitaReadException, SIdentityException {
         final SGroup group = mock(SGroup.class);
@@ -348,10 +293,6 @@ public class IdentityServiceImplForGroupTest {
         identityServiceImpl.getGroups(0, 10);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getGroups(int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}.
-     */
     @Test
     public void getGroupsPaginatedWithOrder() throws Exception {
         final SGroup group = mock(SGroup.class);

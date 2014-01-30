@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,11 +16,6 @@ package org.bonitasoft.engine.supervisor.mapping.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -51,6 +46,7 @@ import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisorLogBuild
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
@@ -58,28 +54,21 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final QueriableLoggerService queriableLoggerService;
 
-    public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
+    public SupervisorMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.queriableLoggerService = queriableLoggerService;
     }
 
     @Override
     public SProcessSupervisor createSupervisor(final SProcessSupervisor supervisor) throws SSupervisorCreationException {
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new supervisor");
-        final InsertRecord insertRecord = new InsertRecord(supervisor);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(SUPERVISOR, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(SUPERVISOR).setObject(supervisor).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(supervisor, SUPERVISOR);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
             initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
             return supervisor;
         } catch (final SRecorderException re) {
@@ -110,14 +99,10 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
 
     @Override
     public void deleteSupervisor(final SProcessSupervisor supervisor) throws SSupervisorDeletionException {
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(SUPERVISOR, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(SUPERVISOR).setObject(supervisor).done();
-        }
-        final DeleteRecord record = new DeleteRecord(supervisor);
+        final DeleteRecord record = new DeleteRecord(supervisor, SUPERVISOR);
         final SProcessSupervisorLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "deleting supervisor");
         try {
-            recorder.recordDelete(record, deleteEvent);
+            recorder.recordDelete(record);
             initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_OK, logBuilder, "createSupervisor");
         } catch (final SRecorderException e) {
             initiateLogBuilder(supervisor.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "createSupervisor");

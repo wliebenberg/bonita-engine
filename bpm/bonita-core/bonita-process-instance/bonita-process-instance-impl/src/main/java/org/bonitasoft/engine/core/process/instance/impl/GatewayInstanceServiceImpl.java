@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -35,11 +35,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayReadEx
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -61,8 +56,6 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final ReadPersistenceService persistenceRead;
 
     private final SGatewayInstanceBuilderFactory sGatewayInstanceBuilderFactory;
@@ -71,11 +64,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     private final TechnicalLoggerService logger;
 
-    public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger,
-            final TokenService tokenService) {
+    public GatewayInstanceServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceRead,
+            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger, final TokenService tokenService) {
         this.recorder = recorder;
-        this.eventService = eventService;
         this.persistenceRead = persistenceRead;
         this.logger = logger;
         this.tokenService = tokenService;
@@ -84,18 +75,14 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
 
     @Override
     public void createGatewayInstance(final SGatewayInstance gatewayInstance) throws SGatewayCreationException {
-        final InsertRecord insertRecord = new InsertRecord(gatewayInstance);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(GATEWAYINSTANCE, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(GATEWAYINSTANCE).setObject(gatewayInstance).done();
-        }
+        final InsertRecord insertRecord = new InsertRecord(gatewayInstance, GATEWAYINSTANCE);
         try {
-            recorder.recordInsert(insertRecord, insertEvent);
+            recorder.recordInsert(insertRecord);
         } catch (final SRecorderException e) {
             throw new SGatewayCreationException(e);
         }
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("Created gateway instance [name: <");
             stb.append(gatewayInstance.getName());
             stb.append(">, id: <");
@@ -107,8 +94,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             stb.append(">, process definition: <");
             stb.append(gatewayInstance.getRootProcessInstanceId());
             stb.append(">]");
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
-                    stb.toString());
+            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
     }
 
@@ -200,14 +186,9 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
         entityUpdateDescriptor.addField(columnName, columnValue);
 
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(gatewayInstance, entityUpdateDescriptor);
-
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(event, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(event).setObject(gatewayInstance).done();
-        }
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(gatewayInstance, event, entityUpdateDescriptor);
         try {
-            recorder.recordUpdate(updateRecord, updateEvent);
+            recorder.recordUpdate(updateRecord);
         } catch (final SRecorderException e) {
             throw new SGatewayModificationException(e);
         }

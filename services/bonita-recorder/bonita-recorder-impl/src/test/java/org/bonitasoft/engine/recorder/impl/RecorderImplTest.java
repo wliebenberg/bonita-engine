@@ -30,6 +30,8 @@ import org.mockito.MockitoAnnotations;
 
 public class RecorderImplTest {
 
+    private static final String AUTHOR = "AUTHOR";
+
     @Mock
     private PersistenceService persistenceService;
 
@@ -51,13 +53,13 @@ public class RecorderImplTest {
     public void recordInsertAnEntityAndFireAnEvent() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final InsertRecord record = new InsertRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.CREATED)).thenReturn(true);
+        final InsertRecord record = new InsertRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.CREATED)).thenReturn(true);
 
         recorder.recordInsert(record);
 
         verify(persistenceService).insert(matti);
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.CREATED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.CREATED);
         verify(eventService).fireEvent(any(SEvent.class));
     }
 
@@ -65,13 +67,13 @@ public class RecorderImplTest {
     public void recordInsertJustAnEntity() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final InsertRecord record = new InsertRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.CREATED)).thenReturn(false);
+        final InsertRecord record = new InsertRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.CREATED)).thenReturn(false);
 
         recorder.recordInsert(record);
 
         verify(persistenceService).insert(matti);
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.CREATED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.CREATED);
         verify(eventService, never()).fireEvent(any(SEvent.class));
     }
 
@@ -79,7 +81,7 @@ public class RecorderImplTest {
     public void recordInsertAnEntityButFailsDueToExceptionOfPersistence() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final InsertRecord record = new InsertRecord(matti);
+        final InsertRecord record = new InsertRecord(matti, AUTHOR);
 
         doThrow(new SPersistenceException("ouch")).when(persistenceService).insert(matti);
 
@@ -90,8 +92,8 @@ public class RecorderImplTest {
     public void recordInsertAnEntityButFailsDueToExceptionOfEventService() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final InsertRecord record = new InsertRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.CREATED)).thenReturn(true);
+        final InsertRecord record = new InsertRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.CREATED)).thenReturn(true);
         doThrow(new FireEventException("ouch")).when(eventService).fireEvent(any(SEvent.class));
 
         recorder.recordInsert(record);
@@ -103,13 +105,13 @@ public class RecorderImplTest {
         matti.setName("Matti");
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("name", "Jaani");
-        final UpdateRecord record = UpdateRecord.buildSetFields(matti, fields);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.UPDATED)).thenReturn(true);
+        final UpdateRecord record = UpdateRecord.buildSetFields(matti, AUTHOR, fields);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.UPDATED)).thenReturn(true);
 
         recorder.recordUpdate(record);
 
         verify(persistenceService).update(any(UpdateDescriptor.class));
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.UPDATED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.UPDATED);
         verify(eventService).fireEvent(any(SEvent.class));
     }
 
@@ -119,13 +121,13 @@ public class RecorderImplTest {
         matti.setName("Matti");
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("name", "Jaani");
-        final UpdateRecord record = UpdateRecord.buildSetFields(matti, fields);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.UPDATED)).thenReturn(false);
+        final UpdateRecord record = UpdateRecord.buildSetFields(matti, AUTHOR, fields);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.UPDATED)).thenReturn(false);
 
         recorder.recordUpdate(record);
 
         verify(persistenceService).update(any(UpdateDescriptor.class));
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.UPDATED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.UPDATED);
         verify(eventService, never()).fireEvent(any(SEvent.class));
     }
 
@@ -135,7 +137,7 @@ public class RecorderImplTest {
         matti.setName("Matti");
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("name", "Jaani");
-        final UpdateRecord record = UpdateRecord.buildSetFields(matti, fields);
+        final UpdateRecord record = UpdateRecord.buildSetFields(matti, AUTHOR, fields);
 
         doThrow(new SPersistenceException("ouch")).when(persistenceService).update(any(UpdateDescriptor.class));
 
@@ -148,8 +150,8 @@ public class RecorderImplTest {
         matti.setName("Matti");
         final Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("name", "Jaani");
-        final UpdateRecord record = UpdateRecord.buildSetFields(matti, fields);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.UPDATED)).thenReturn(true);
+        final UpdateRecord record = UpdateRecord.buildSetFields(matti, AUTHOR, fields);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.UPDATED)).thenReturn(true);
         doThrow(new FireEventException("ouch")).when(eventService).fireEvent(any(SEvent.class));
 
         recorder.recordUpdate(record);
@@ -159,13 +161,13 @@ public class RecorderImplTest {
     public void recordDeleteAnEntityAndFireAnEvent() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final DeleteRecord record = new DeleteRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.DELETED)).thenReturn(true);
+        final DeleteRecord record = new DeleteRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.DELETED)).thenReturn(true);
 
         recorder.recordDelete(record);
 
         verify(persistenceService).delete(matti);
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.DELETED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.DELETED);
         verify(eventService).fireEvent(any(SEvent.class));
     }
 
@@ -173,13 +175,13 @@ public class RecorderImplTest {
     public void recordDeleteJustAnEntity() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final DeleteRecord record = new DeleteRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.DELETED)).thenReturn(false);
+        final DeleteRecord record = new DeleteRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.DELETED)).thenReturn(false);
 
         recorder.recordDelete(record);
 
         verify(persistenceService).delete(matti);
-        verify(eventService).hasHandlers(Author.class.getName(), EventActionType.DELETED);
+        verify(eventService).hasHandlers(AUTHOR, EventActionType.DELETED);
         verify(eventService, never()).fireEvent(any(SEvent.class));
     }
 
@@ -187,7 +189,7 @@ public class RecorderImplTest {
     public void recordDeleteAnEntityButFailsDueToExceptionOfPersistence() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final DeleteRecord record = new DeleteRecord(matti);
+        final DeleteRecord record = new DeleteRecord(matti, AUTHOR);
         doThrow(new SPersistenceException("ouch")).when(persistenceService).delete(matti);
 
         recorder.recordDelete(record);
@@ -197,8 +199,8 @@ public class RecorderImplTest {
     public void recordDeleteAnEntityButFailsDueToExceptionOfEventService() throws SBonitaException {
         final Author matti = new Author();
         matti.setName("Matti");
-        final DeleteRecord record = new DeleteRecord(matti);
-        when(eventService.hasHandlers(Author.class.getName(), EventActionType.DELETED)).thenReturn(true);
+        final DeleteRecord record = new DeleteRecord(matti, AUTHOR);
+        when(eventService.hasHandlers(AUTHOR, EventActionType.DELETED)).thenReturn(true);
         doThrow(new FireEventException("ouch")).when(eventService).fireEvent(any(SEvent.class));
 
         recorder.recordDelete(record);

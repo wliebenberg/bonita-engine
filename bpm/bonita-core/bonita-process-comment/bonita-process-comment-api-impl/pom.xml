@@ -45,11 +45,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
 			<artifactId>bonita-archive-api</artifactId>
 			<version>${project.version}</version>

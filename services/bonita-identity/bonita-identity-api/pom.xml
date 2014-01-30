@@ -18,10 +18,5 @@
 			<artifactId>bonita-identity-model</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>

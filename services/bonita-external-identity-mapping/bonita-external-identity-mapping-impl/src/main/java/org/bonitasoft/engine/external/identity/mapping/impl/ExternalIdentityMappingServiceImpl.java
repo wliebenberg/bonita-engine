@@ -70,8 +70,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
     private final QueriableLoggerService queriableLoggerService;
 
     public ExternalIdentityMappingServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final EventService eventService,
-            final TechnicalLoggerService logger,
-            final QueriableLoggerService queriableLoggerService) {
+            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
         this.persistenceService = persistenceService;
         this.recorder = recorder;
         this.eventService = eventService;
@@ -88,10 +87,11 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         final SExternalIdentityMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Adding a new ExternalIdentityMapping for external id "
                 + externalIdentityMapping.getExternalId());
         try {
-            final InsertRecord insertRecord = new InsertRecord(externalIdentityMapping);
+            final InsertRecord insertRecord = new InsertRecord(externalIdentityMapping, EXTERNAL_IDENTITY_MAPPING);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING)
+                        .setObject(externalIdentityMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
@@ -189,9 +189,10 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         }
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING)
+                    .setObject(externalIdentityMapping).done();
         }
-        final DeleteRecord record = new DeleteRecord(externalIdentityMapping);
+        final DeleteRecord record = new DeleteRecord(externalIdentityMapping, EXTERNAL_IDENTITY_MAPPING);
         final SExternalIdentityMappingLogBuilder queriableLog = getQueriableLog(ActionType.DELETED, "deleting external identity mapping");
         try {
             recorder.recordDelete(record, deleteEvent);

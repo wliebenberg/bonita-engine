@@ -12,7 +12,6 @@
                 <entry key="STATE_CHANGE" value="true" />
             </map>
         </constructor-arg>
-        <constructor-arg name="eventService" ref="eventService" />
     </bean>
 
 </beans>

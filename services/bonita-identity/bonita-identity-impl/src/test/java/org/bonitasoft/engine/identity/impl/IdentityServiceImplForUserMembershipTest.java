@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.identity.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -23,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
@@ -58,9 +44,6 @@ public class IdentityServiceImplForUserMembershipTest {
     private ReadPersistenceService persistenceService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private TechnicalLoggerService logger;
 
     @InjectMocks
@@ -71,9 +54,6 @@ public class IdentityServiceImplForUserMembershipTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMembership(long)}.
-     */
     @Test
     public final void getLightUserMembershipById() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -96,9 +76,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getLightUserMembership(546L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMembership(long, long, long)}.
-     */
     @Test
     public final void getLightUserMembershipByUserAndGroupAndRole() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -121,9 +98,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getLightUserMembership(546L, 565L, 54L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getLightUserMemberships(int, int)}.
-     */
     @Test
     public final void getLightUserMembershipsPaginated() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -140,9 +114,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getLightUserMemberships(546, 565);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUserMemberships()}.
-     */
     @Test
     public final void getNumberOfUserMemberships() throws SBonitaReadException, SIdentityException {
         final long numberOfUserMemberships = 3;
@@ -158,9 +129,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getNumberOfUserMemberships();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUserMembershipsOfUser(long)}.
-     */
     @Test
     public final void getNumberOfUserMembershipsOfUser() throws SBonitaReadException, SIdentityException {
         final long numberOfUserMemberships = 3;
@@ -176,9 +144,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getNumberOfUserMembershipsOfUser(4854L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembership(long)}.
-     */
     @Test
     public final void getUserMembershipById() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -201,9 +166,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getUserMembership(546L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembership(long, long, long)}.
-     */
     @Test
     public final void getUserMembershipByUserAndGroupAndRole() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -226,9 +188,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getUserMembership(546L, 565L, 54L);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfGroup(long)}.
-     */
     @Test
     public void getUserMembershipsOfGroup() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -246,9 +205,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getUserMembershipsOfGroup(1l, 0, 20);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMembershipsOfRole(long)}.
-     */
     @Test
     public void getUserMembershipsOfRole() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -266,10 +222,6 @@ public class IdentityServiceImplForUserMembershipTest {
         identityServiceImpl.getUserMembershipsOfRole(1l, 0, 20);
     }
 
-    /**
-     * Test method for
-     * {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(int, int, org.bonitasoft.engine.persistence.OrderByOption)}.
-     */
     @Test
     public void getUserMembershipsPaginatedWithOrder() throws Exception {
         final SUserMembership userMembership = mock(SUserMembership.class);
@@ -320,9 +272,6 @@ public class IdentityServiceImplForUserMembershipTest {
         assertEquals(userMembership, userMemberships.get(0));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUserMemberships(int, int)}.
-     */
     @Test
     public final void getUserMembershipsPaginated() throws SBonitaReadException, SIdentityException {
         final SUserMembership userMembership = mock(SUserMembership.class);

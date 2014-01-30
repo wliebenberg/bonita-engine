@@ -67,9 +67,9 @@ public class DataServiceImpl implements DataService {
 
     protected static final String DATA_SOURCE_TYPE = "___datasource___";
 
-    public DataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final ClassLoaderService classLoaderService, final EventService eventService, final List<DataSourceConfiguration> dataSourceConfigurations,
-            final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+    public DataServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final ClassLoaderService classLoaderService,
+            final EventService eventService, final List<DataSourceConfiguration> dataSourceConfigurations, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.classLoaderService = classLoaderService;
@@ -165,8 +165,9 @@ public class DataServiceImpl implements DataService {
         }
         final SDataSourceLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new datasource");
         try {
-            final InsertRecord insertRecord = new InsertRecord(dataSource);
-            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATASOURCE).setObject(dataSource).done();
+            final InsertRecord insertRecord = new InsertRecord(dataSource, DATASOURCE);
+            final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATASOURCE).setObject(dataSource)
+                    .done();
             recorder.recordInsert(insertRecord, insertEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDataSource"));
@@ -238,8 +239,9 @@ public class DataServiceImpl implements DataService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "removeDataSource"));
             }
-            final DeleteRecord deleteRecord = new DeleteRecord(dataSource);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATASOURCE).setObject(dataSource).done();
+            final DeleteRecord deleteRecord = new DeleteRecord(dataSource, DATASOURCE);
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATASOURCE).setObject(dataSource)
+                    .done();
             recorder.recordDelete(deleteRecord, deleteEvent);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeDataSource"));

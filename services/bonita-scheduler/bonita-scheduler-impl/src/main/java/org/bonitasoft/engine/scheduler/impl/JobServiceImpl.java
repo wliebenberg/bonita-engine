@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,11 +18,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -62,16 +57,12 @@ import org.bonitasoft.engine.scheduler.recorder.SelectDescriptorBuilder;
  */
 public class JobServiceImpl implements JobService {
 
-    private final EventService eventService;
-
     private final Recorder recorder;
 
     private final ReadPersistenceService readPersistenceService;
 
-    public JobServiceImpl(final EventService eventService,
-            final Recorder recorder, final ReadPersistenceService readPersistenceService) {
+    public JobServiceImpl(final Recorder recorder, final ReadPersistenceService readPersistenceService) {
         this.readPersistenceService = readPersistenceService;
-        this.eventService = eventService;
         this.recorder = recorder;
     }
 
@@ -293,22 +284,14 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private void delete(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
-        final DeleteRecord deleteRecord = new DeleteRecord(persistentObject);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(eventType).setObject(persistentObject).done();
-        }
-        recorder.recordDelete(deleteRecord, deleteEvent);
+    private void delete(final PersistentObject persistentObject, final String entityType) throws SRecorderException {
+        final DeleteRecord deleteRecord = new DeleteRecord(persistentObject, entityType);
+        recorder.recordDelete(deleteRecord);
     }
 
-    private void create(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
-        final InsertRecord insertRecord = new InsertRecord(persistentObject);
-        SInsertEvent insertEvent = null;
-        if (eventService.hasHandlers(eventType, EventActionType.CREATED)) {
-            insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(eventType).setObject(persistentObject).done();
-        }
-        recorder.recordInsert(insertRecord, insertEvent);
+    private void create(final PersistentObject persistentObject, final String entityType) throws SRecorderException {
+        final InsertRecord insertRecord = new InsertRecord(persistentObject, entityType);
+        recorder.recordInsert(insertRecord);
     }
 
     @Override

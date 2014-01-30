@@ -159,7 +159,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="handlers">
 			<map>
-				<entry key="PROCESSINSTANCE_STATE_UPDATED">
+				<entry key="SProcessInstanceImpl_UPDATED">
                     <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
 						<constructor-arg name="tenantId" value="0" />
 					</bean>

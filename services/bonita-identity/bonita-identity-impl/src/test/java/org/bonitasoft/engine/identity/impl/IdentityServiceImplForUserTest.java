@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.identity.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -60,9 +46,6 @@ public class IdentityServiceImplForUserTest {
     private ReadPersistenceService persistenceService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private TechnicalLoggerService logger;
 
     @InjectMocks
@@ -73,9 +56,6 @@ public class IdentityServiceImplForUserTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers()}.
-     */
     @Test
     public void getNumberOfUsers() throws Exception {
         when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(1L);
@@ -90,9 +70,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getNumberOfUsers();
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void getNumberOfUsersWithOptions() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -109,9 +86,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getNumberOfUsers(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByGroup(long)}.
-     */
     @Test
     public void getNumberOfUsersByGroup() throws Exception {
         final long groupId = 1;
@@ -128,9 +102,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getNumberOfUsersByGroup(groupId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByMembership(long, long)}.
-     */
     @Test
     public void getNumberOfUsersByMembership() throws Exception {
         final long groupId = 1;
@@ -149,9 +120,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getNumberOfUsersByMembership(groupId, roleId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getNumberOfUsersByRole(long)}.
-     */
     @Test
     public void getNumberOfUsersByRole() throws Exception {
         final long roleId = 2;
@@ -168,9 +136,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getNumberOfUsersByRole(roleId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUser(long)}.
-     */
     @Test
     public void getUserById() throws SBonitaReadException, SUserNotFoundException {
         final long userId = 1;
@@ -196,9 +161,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getUser(userId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#getUsers(java.util.List)}.
-     */
     @Test
     public void getUsersByIds() throws Exception {
         final SUser sUser1 = mock(SUser.class);
@@ -258,9 +220,6 @@ public class IdentityServiceImplForUserTest {
         identityServiceImpl.getUsersByUsername(Arrays.asList("hannu"));
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.identity.impl.IdentityServiceImpl#searchUsers(org.bonitasoft.engine.persistence.QueryOptions)}.
-     */
     @Test
     public void searchUsers() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);

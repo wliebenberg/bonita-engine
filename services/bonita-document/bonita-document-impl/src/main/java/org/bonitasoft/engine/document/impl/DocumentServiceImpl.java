@@ -64,9 +64,9 @@ public class DocumentServiceImpl implements DocumentService {
     public SDocument storeDocumentContent(final SDocument sDocument, final byte[] documentContent) throws SDocumentStorageException {
         final String documentId = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
         final SDocumentContent sdocumentContent = createDocumentContent(documentId, documentContent);
-        final InsertRecord insertRecord = new InsertRecord(sdocumentContent);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("SDocumentContent").setObject(sdocumentContent)
-                .done();
+        final InsertRecord insertRecord = new InsertRecord(sdocumentContent, DOCUMENT_CONTENT);
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent("SDocumentContent")
+                .setObject(sdocumentContent).done();
         try {
             recorder.recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException re) {
@@ -84,11 +84,10 @@ public class DocumentServiceImpl implements DocumentService {
     public void deleteDocumentContent(final String documentId) throws SDocumentDeletionException, SDocumentContentNotFoundException {
         SDocumentContent sdocumentContent = null;
         try {
-            // sdocumentContent = getDocumentContent(sDocument.getStorageId());
             sdocumentContent = getDocumentContent(documentId);
-            final DeleteRecord deleteRecord = new DeleteRecord(sdocumentContent);
-            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent").setObject(sdocumentContent)
-                    .done();
+            final DeleteRecord deleteRecord = new DeleteRecord(sdocumentContent, DOCUMENT_CONTENT);
+            final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocumentContent")
+                    .setObject(sdocumentContent).done();
             recorder.recordDelete(deleteRecord, deleteEvent);
         } catch (final SRecorderException e) {
             throw new SDocumentDeletionException("can't delete Document content " + sdocumentContent, e);

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -39,12 +39,6 @@ import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyLogBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingLogBuilderFactory;
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
-import org.bonitasoft.engine.events.model.SUpdateEvent;
-import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -76,8 +70,6 @@ public class DependencyServiceImpl implements DependencyService {
 
     private final Recorder recorder;
 
-    private final EventService eventService;
-
     private final TechnicalLoggerService logger;
 
     private final QueriableLoggerService queriableLoggerService;
@@ -86,13 +78,11 @@ public class DependencyServiceImpl implements DependencyService {
 
     private final Map<String, Long> lastUpdates = Collections.synchronizedMap(new HashMap<String, Long>());
 
-    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
-            final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
-            final ClassLoaderService classLoaderService) {
+    public DependencyServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder, final TechnicalLoggerService logger,
+            final QueriableLoggerService queriableLoggerService, final ClassLoaderService classLoaderService) {
         super();
         this.persistenceService = persistenceService;
         this.recorder = recorder;
-        this.eventService = eventService;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         this.classLoaderService = classLoaderService;
@@ -137,12 +127,8 @@ public class DependencyServiceImpl implements DependencyService {
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency with name " + dependency.getName());
         NullCheckingUtil.checkArgsNotNull(dependency);
         try {
-            final InsertRecord insertRecord = new InsertRecord(dependency);
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(DEPENDENCY, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCY).setObject(dependency).done();
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            final InsertRecord insertRecord = new InsertRecord(dependency, DEPENDENCY);
+            recorder.recordInsert(insertRecord);
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createDependency"));
             }
@@ -164,13 +150,8 @@ public class DependencyServiceImpl implements DependencyService {
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a dependency mapping", dependencyMapping);
         NullCheckingUtil.checkArgsNotNull(dependencyMapping);
         try {
-            final InsertRecord insertRecord = new InsertRecord(dependencyMapping);
-
-            SInsertEvent insertEvent = null;
-            if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
-            }
-            recorder.recordInsert(insertRecord, insertEvent);
+            final InsertRecord insertRecord = new InsertRecord(dependencyMapping, DEPENDENCYMAPPING);
+            recorder.recordInsert(insertRecord);
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createDependencyMapping");
             lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -233,13 +214,9 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(dependency);
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency named " + dependency.getName());
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(DEPENDENCY, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCY).setObject(dependency).done();
-        }
         try {
-            final DeleteRecord record = new DeleteRecord(dependency);
-            recorder.recordDelete(record, deleteEvent);
+            final DeleteRecord record = new DeleteRecord(dependency, DEPENDENCY);
+            recorder.recordDelete(record);
             initiateLogBuilder(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependency");
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "deleteDependency"));
@@ -306,13 +283,9 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(dependencyMapping);
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.DELETED, "Deleting a dependency mapping", dependencyMapping);
-        SDeleteEvent deleteEvent = null;
-        if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
-        }
         try {
-            final DeleteRecord deleteRecord = new DeleteRecord(dependencyMapping);
-            recorder.recordDelete(deleteRecord, deleteEvent);
+            final DeleteRecord deleteRecord = new DeleteRecord(dependencyMapping, DEPENDENCYMAPPING);
+            recorder.recordDelete(deleteRecord);
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "deleteDependencyMapping");
             lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -336,8 +309,7 @@ public class DependencyServiceImpl implements DependencyService {
         NullCheckingUtil.checkArgsNotNull(queryOptions);
         try {
             final List<SDependency> listSDependency = persistenceService.selectList(new SelectListDescriptor<SDependency>("getDependencies", null,
-                    SDependency.class,
-                    queryOptions));
+                    SDependency.class, queryOptions));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getDependencies"));
             }
@@ -542,13 +514,9 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(dependency, descriptor);
         final SDependencyLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a dependency named " + dependency.getName());
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(DEPENDENCY, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCY).setObject(dependency).done();
-        }
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependency, descriptor);
-            recorder.recordUpdate(updateRecord, updateEvent);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependency, DEPENDENCY, descriptor);
+            recorder.recordUpdate(updateRecord);
             initiateLogBuilder(dependency.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDependency");
             QueryOptions queryOptions = QueryOptions.defaultQueryOptions();
             List<SDependencyMapping> dependencyMappings;
@@ -580,13 +548,9 @@ public class DependencyServiceImpl implements DependencyService {
         }
         NullCheckingUtil.checkArgsNotNull(dependencyMapping, descriptor);
         final SDependencyMappingLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating a dependency mapping", dependencyMapping);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(DEPENDENCYMAPPING, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DEPENDENCYMAPPING).setObject(dependencyMapping).done();
-        }
         try {
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependencyMapping, descriptor);
-            recorder.recordUpdate(updateRecord, updateEvent);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dependencyMapping, DEPENDENCYMAPPING, descriptor);
+            recorder.recordUpdate(updateRecord);
             initiateLogBuilder(dependencyMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "updateDependencyMapping");
             lastUpdates.put(getKey(dependencyMapping.getArtifactType(), dependencyMapping.getArtifactId()), System.currentTimeMillis());
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

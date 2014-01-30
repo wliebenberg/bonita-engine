@@ -46,7 +46,7 @@ public interface ProfileService {
 
     String PROFILE = "PROFILE";
 
-    String ENTRY_PROFILE = "ENTRY_PROFILE";
+    String PROFILE_ENTRY = "PROFILE_ENTRY";
 
     String PROFILE_MEMBER = "PROFILE_MEMBER";
 

@@ -43,7 +43,6 @@
 	</bean>
 
 	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
-		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="readPersistenceService" ref="persistenceService" />
 	</bean>

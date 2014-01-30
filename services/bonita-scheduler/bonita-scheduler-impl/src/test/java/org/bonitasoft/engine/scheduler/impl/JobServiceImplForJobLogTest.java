@@ -1,16 +1,3 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -26,10 +13,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
-import org.bonitasoft.engine.events.EventActionType;
-import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SDeleteEvent;
-import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -62,9 +45,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class JobServiceImplForJobLogTest {
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private QueriableLoggerService queriableLoggerService;
 
     @Mock
@@ -76,19 +56,12 @@ public class JobServiceImplForJobLogTest {
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#createJobLog(org.bonitasoft.engine.scheduler.model.SJobLog)}.
-     * 
-     * @throws SRecorderException
-     * @throws SJobLogCreationException
-     */
     @Test
     public final void createJobLog() throws SRecorderException, SJobLogCreationException {
         final SJobLog sJobLog = mock(SJobLog.class);
         doReturn(1L).when(sJobLog).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doNothing().when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         final SJobLog result = jobServiceImpl.createJobLog(sJobLog);
@@ -106,22 +79,12 @@ public class JobServiceImplForJobLogTest {
         final SJobLog sJobLog = mock(SJobLog.class);
         doReturn(1L).when(sJobLog).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+        doThrow(new SRecorderException("plop")).when(recorder).recordInsert(any(InsertRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.createJobLog(sJobLog);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobLog(long)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SRecorderException
-     * @throws SJobLogDeletionException
-     * @throws SJobLogReadException
-     * @throws SJobLogNotFoundException
-     */
     @Test
     public final void deleteJobLogById() throws SBonitaReadException, SRecorderException, SJobLogNotFoundException, SJobLogReadException,
             SJobLogDeletionException {
@@ -129,16 +92,14 @@ public class JobServiceImplForJobLogTest {
         doReturn(3L).when(sJobLog).getId();
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.deleteJobLog(3);
     }
 
     @Test(expected = SJobLogNotFoundException.class)
-    public final void deleteNotExistingJobLogById() throws SBonitaReadException, SJobLogDeletionException, SJobLogNotFoundException,
-            SJobLogReadException {
+    public final void deleteNotExistingJobLogById() throws SBonitaReadException, SJobLogDeletionException, SJobLogNotFoundException, SJobLogReadException {
         when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any())).thenReturn(null);
 
         jobServiceImpl.deleteJobLog(1);
@@ -150,25 +111,17 @@ public class JobServiceImplForJobLogTest {
         doReturn(3L).when(sJobLog).getId();
 
         doReturn(sJobLog).when(readPersistenceService).selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any());
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         jobServiceImpl.deleteJobLog(3);
     }
 
-    /**
-     * method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#deleteJobLog(org.bonitasoft.engine.scheduler.model.SJobLog)}.
-     * 
-     * @throws SRecorderException
-     * @throws SJobLogDeletionException
-     */
     @Test
     public final void deleteJobLogByObject() throws SRecorderException, SJobLogDeletionException {
         final SJobLog sJobLog = mock(SJobLog.class);
         doReturn(3L).when(sJobLog).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doNothing().when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doNothing().when(recorder).recordDelete(any(DeleteRecord.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));
 
         jobServiceImpl.deleteJobLog(sJobLog);
@@ -184,19 +137,11 @@ public class JobServiceImplForJobLogTest {
         final SJobLog sJobLog = mock(SJobLog.class);
         doReturn(3L).when(sJobLog).getId();
 
-        doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
-        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class));
 
         jobServiceImpl.deleteJobLog(sJobLog);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getJobLog(long)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SJobLogReadException
-     * @throws SJobLogNotFoundException
-     */
     @Test
     public void getJobLogById() throws SBonitaReadException, SJobLogNotFoundException, SJobLogReadException {
         final long jobLogId = 1;
@@ -223,12 +168,6 @@ public class JobServiceImplForJobLogTest {
         jobServiceImpl.getJobLog(jobLogId);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#getNumberOfJobLogs(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     */
     @Test
     public void getNumberOfJobLogs() throws SBonitaReadException, SBonitaSearchException {
         final QueryOptions options = new QueryOptions(0, 10);
@@ -247,12 +186,6 @@ public class JobServiceImplForJobLogTest {
         jobServiceImpl.getNumberOfJobLogs(options);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#searchJobLogs(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
-     * @throws SBonitaReadException
-     * @throws SBonitaSearchException
-     */
     @Test
     public void searchJobLogs() throws SBonitaSearchException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);

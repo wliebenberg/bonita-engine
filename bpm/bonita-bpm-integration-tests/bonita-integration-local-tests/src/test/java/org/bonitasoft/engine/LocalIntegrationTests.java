@@ -1,17 +1,18 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.event.ErrorEventSubProcessTest;
+import org.bonitasoft.engine.event.SignalEventSubProcessTest;
+import org.bonitasoft.engine.process.ProcessDeletionTest;
+import org.bonitasoft.engine.search.SearchProcessInstanceTest;
 import org.bonitasoft.engine.test.APIMethodTest;
-import org.bonitasoft.engine.test.BPMLocalSuiteTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
-@SuiteClasses({
-        BPMLocalSuiteTests.class,
-        BPMRemoteTests.class,
+@SuiteClasses({ ProcessDeletionTest.class, SearchProcessInstanceTest.class, SignalEventSubProcessTest.class, ErrorEventSubProcessTest.class,
         APIMethodTest.class })
 @Initializer(TestsInitializer.class)
 public class LocalIntegrationTests {

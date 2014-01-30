@@ -76,7 +76,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public void createDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         try {
-            final InsertRecord insertRecord = new InsertRecord(dataInstance);
+            final InsertRecord insertRecord = new InsertRecord(dataInstance, DATA_INSTANCE);
             final SInsertEvent insertEvent = getInsertEvent(dataInstance);
             recorder.recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
@@ -87,7 +87,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public void updateDataInstance(final SDataInstance dataInstance, final EntityUpdateDescriptor descriptor) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, descriptor);
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(dataInstance, DATA_INSTANCE, descriptor);
         final SUpdateEvent updateEvent = getUpdateEvent(dataInstance);
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
@@ -99,7 +99,7 @@ public class DataInstanceDataSourceImpl implements DataInstanceDataSource {
     @Override
     public void deleteDataInstance(final SDataInstance dataInstance) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataInstance);
-        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance);
+        final DeleteRecord deleteRecord = new DeleteRecord(dataInstance, DATA_INSTANCE);
         final SDeleteEvent deleteEvent = getDeleteEvent(dataInstance);
         try {
             recorder.recordDelete(deleteRecord, deleteEvent);

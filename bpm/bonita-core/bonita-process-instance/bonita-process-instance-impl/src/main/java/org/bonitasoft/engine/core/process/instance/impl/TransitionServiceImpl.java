@@ -57,8 +57,8 @@ public class TransitionServiceImpl implements TransitionService {
 
     private final ArchiveService archiveService;
 
-    public TransitionServiceImpl(final ReadPersistenceService persistenceRead,
-            final ArchiveService archiveService, final QueriableLoggerService queriableLoggerService) {
+    public TransitionServiceImpl(final ReadPersistenceService persistenceRead, final ArchiveService archiveService,
+            final QueriableLoggerService queriableLoggerService) {
         this.persistenceRead = persistenceRead;
         this.archiveService = archiveService;
     }
@@ -74,7 +74,7 @@ public class TransitionServiceImpl implements TransitionService {
     @Override
     public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaSearchException {
         try {
-            return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
+            return persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -83,7 +83,7 @@ public class TransitionServiceImpl implements TransitionService {
     @Override
     public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
-            return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
+            return persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
@@ -107,8 +107,8 @@ public class TransitionServiceImpl implements TransitionService {
 
     private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException,
             SDefinitiveArchiveNotFound {
-        final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance);
-        this.archiveService.recordInsert(archiveDate, insertRecord);
+        final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance, null);
+        archiveService.recordInsert(archiveDate, insertRecord);
     }
 
     protected STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
@@ -120,9 +120,9 @@ public class TransitionServiceImpl implements TransitionService {
 
     @Override
     public void delete(final SATransitionInstance saTransitionInstance) throws STransitionDeletionException {
-        final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance);
+        final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance, null);
         try {
-            this.archiveService.recordDelete(deleteRecord);
+            archiveService.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw new STransitionDeletionException(e);
         }
