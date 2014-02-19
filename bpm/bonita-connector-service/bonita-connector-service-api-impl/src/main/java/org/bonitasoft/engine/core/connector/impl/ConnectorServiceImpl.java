@@ -183,7 +183,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         return stb.toString();
     }
 
-    private static String buildConnectorInputMessage(Map<String, Object> inputParameters) {
+    private static String buildConnectorInputMessage(final Map<String, Object> inputParameters) {
         StringBuilder stb = new StringBuilder();
         if (inputParameters != null && !inputParameters.isEmpty()) {
             stb.append(LINE_SEPARATOR);
@@ -280,6 +280,8 @@ public class ConnectorServiceImpl implements ConnectorService {
         try {
             inputParameters = evaluateInputParameters(connectorInputParameters, sexpContext, inputValues);
             connectorResult = executeConnectorInClassloader(implementationClassName, classLoader, inputParameters);
+        } catch (SConnectorException e) {
+            throw e; // No need to wrap again the exception
         } catch (final SBonitaException e) {
             throw new SConnectorException(e);
         }
@@ -311,7 +313,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException(implementationClassName + " can not be instantiated.", e);
         } catch (final IllegalAccessException e) {
             throw new SConnectorException(e);
-        } catch (final org.bonitasoft.engine.connector.exception.SConnectorException e) {
+        } catch (final org.bonitasoft.engine.connector.exception.SConnectorException e) { // TO INVESTIGATE : there are 2 classes SConnectorExceptions ?
             throw new SConnectorException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);

@@ -503,8 +503,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
 
             processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
+        } catch (final DeletionException e) {
+            throw e;
         } catch (final Exception e) {
-            throw new DeletionException(e);
+            throw new ProcessDefinitionDeletionException(processDefinitionId, e);
         }
     }
 
@@ -3303,7 +3305,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return getSerializableResultOfConnector(connectorDefinitionVersion, connectorResult, connectorService);
             }
         } catch (final SBonitaException e) {
-            throw new ConnectorExecutionException(e);
+            throw new ConnectorExecutionException(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters, e);
         } catch (final NotSerializableException e) {
             throw new ConnectorExecutionException(e);
         }

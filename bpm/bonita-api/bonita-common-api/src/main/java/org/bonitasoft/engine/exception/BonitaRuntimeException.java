@@ -17,7 +17,7 @@ package org.bonitasoft.engine.exception;
 /**
  * @author Matthieu Chaffotte
  */
-public class BonitaRuntimeException extends RuntimeException {
+public class BonitaRuntimeException extends RuntimeException implements BonitaContextException {
 
     private static final long serialVersionUID = -5413586694735909486L;
 

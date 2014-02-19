@@ -17,9 +17,14 @@ package org.bonitasoft.engine.exception;
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  */
-public class BonitaException extends Exception {
+public class BonitaException extends Exception implements BonitaContextException {
 
     private static final long serialVersionUID = -5413586694735909486L;
+
+    private long tenantId;
+    private String hostname;
+    private String userName;
+
 
     public BonitaException(final String message) {
         super(message);
@@ -33,4 +38,33 @@ public class BonitaException extends Exception {
         super(cause);
     }
 
+
+    public long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(final long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(final String hostname) {
+        this.hostname = hostname;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(final String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Hostname : " + hostname + " tenantId: " + tenantId + " " + super.getMessage();
+    }
 }

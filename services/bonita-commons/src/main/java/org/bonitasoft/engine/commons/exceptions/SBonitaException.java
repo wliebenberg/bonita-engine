@@ -87,11 +87,12 @@ public abstract class SBonitaException extends Exception {
     @Override
     public String getMessage() {
         String message = super.getMessage();
-        if (message != null && message.isEmpty() && getCause() != null) {
-            message = getCause().getMessage();
-        }
         if (message != null && message.isEmpty()) {
-            message = getDefaultMessage();
+            if (getCause() != null) {
+                message = getCause().getMessage();
+            } else {
+                message = getDefaultMessage();
+            }
         }
         return message;
     }
