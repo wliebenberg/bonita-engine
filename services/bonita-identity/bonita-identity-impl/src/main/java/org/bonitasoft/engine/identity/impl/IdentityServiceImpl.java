@@ -168,7 +168,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public void createProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
+    public SProfileMetadataDefinition createProfileMetadataDefinition(final SProfileMetadataDefinition metadata) throws SIdentityException {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "createProfileMetadataDefinition"));
         }
@@ -182,6 +182,7 @@ public class IdentityServiceImpl implements IdentityService {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "createProfileMetadataDefinition"));
             }
+            return metadata;
         } catch (final SRecorderException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "createProfileMetadataDefinition", e));
