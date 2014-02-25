@@ -205,11 +205,6 @@ public abstract class SFlowNodeInstanceImpl extends SFlowElementInstanceImpl imp
     public void setFlowNodeDefinitionId(long flowNodeDefinitionId) {
         this.flowNodeDefinitionId = flowNodeDefinitionId;
     }
-    
-    @Override
-    public boolean mustExecuteOnAbortOrCancelProcess() {
-        return isStable();
-    }
 
     @Override
     public int hashCode() {

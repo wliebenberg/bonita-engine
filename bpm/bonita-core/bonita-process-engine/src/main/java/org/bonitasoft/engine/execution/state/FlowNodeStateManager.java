@@ -31,7 +31,7 @@ import org.bonitasoft.engine.execution.ProcessExecutor;
  */
 public interface FlowNodeStateManager {
 
-    FlowNodeState getNextNormalState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int currentStateId)
+    FlowNodeState getNextNormalState(SProcessDefinition processDefinition, SFlowNodeInstance flowNodeInstance, int currentState)
             throws SActivityExecutionException;
 
     FlowNodeState getFailedState();// TODO get the old state?

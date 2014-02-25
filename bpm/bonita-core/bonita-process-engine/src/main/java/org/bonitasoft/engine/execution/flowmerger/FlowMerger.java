@@ -16,7 +16,6 @@ package org.bonitasoft.engine.execution.flowmerger;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-import org.bonitasoft.engine.execution.TokenProvider;
 
 
 /**
@@ -38,17 +37,14 @@ public class FlowMerger {
         this.tokenProvider = tokenProvider;
     }
 
-    /**
-     * @return return true if the input token must be consume on taking the next transition; false otherwise.
-     */
-    public boolean mustConsumeInputTokenOnTakingTransition() {
+    public boolean mustConsumeInputToken() {
         return !flowNodewrapper.isBoundaryEvent()
             && flowNodewrapper.isParalleleOrInclusive()
             && !transitionsWrapper.isLastFlowNode()
             && transitionsWrapper.hasMultipleIncomingTransitions();
     }
     
-    public boolean mustCreateTokenOnFinish() throws SObjectReadException, SObjectNotFoundException {
+    public boolean mustCreateToken() throws SObjectReadException, SObjectNotFoundException {
         if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent() || flowNodewrapper.isExclusive() || transitionsWrapper.isLastFlowNode()) {
             return false;
         }
@@ -56,7 +52,7 @@ public class FlowMerger {
     }
     
     public boolean isImplicitEnd() {
-        if(flowNodewrapper.isNull()) {
+        if(flowNodewrapper.isNull() || flowNodewrapper.isBoundaryEvent()) {
             return false;
         }
         return transitionsWrapper.isLastFlowNode();

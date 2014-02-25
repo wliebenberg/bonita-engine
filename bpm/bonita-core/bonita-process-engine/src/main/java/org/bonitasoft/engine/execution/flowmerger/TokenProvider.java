@@ -20,12 +20,11 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.execution.TokenProvider;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class FlowNodeCompletionTokenProvider implements TokenProvider {
+public class TokenProvider {
 
     private SFlowNodeWrapper flowNodeWrapper;
 
@@ -39,7 +38,7 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
     
     private TokenInfo tokenInfo = null;
 
-    public FlowNodeCompletionTokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
+    public TokenProvider(final SFlowNodeInstance child, final SProcessInstance sProcessInstance, final SFlowNodeWrapper flowNodeWrapper,
             final FlowNodeTransitionsWrapper transitionsDescriptor, TokenService tokenService) {
         this.child = child;
         this.processInstance = sProcessInstance;
@@ -48,7 +47,6 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
         this.tokenService = tokenService;
     }
 
-    @Override
     public TokenInfo getOutputTokenInfo() throws SObjectReadException, SObjectNotFoundException, SObjectCreationException {
         if(tokenInfo != null) {
             return tokenInfo;
@@ -63,13 +61,13 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
             return new TokenInfo();
         }
 
-        if (flowNodeWrapper.isBoundaryEvent() && flowNodeWrapper.isInterrupting()) {
-                return tansmitAllTokenInfo();
+        if (flowNodeWrapper.isBoundaryEvent()) {
+            return getOutputTokenRefIdFromBoundaryEvent();
         }
 
-        if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge() || isNonInterruptingBoundaryEvent()) {
+        if (flowNodeWrapper.isExclusive() || transitionsDescriptor.isSimpleMerge()) {
             // always transmit token
-            return transmitOnlyTokenRefId();
+            return transmitToken();
         }
         
         if (transitionsDescriptor.isSimpleToMany()) {
@@ -96,10 +94,6 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
         
         return new TokenInfo();
     }
-
-    private boolean isNonInterruptingBoundaryEvent() {
-        return flowNodeWrapper.isBoundaryEvent() && !flowNodeWrapper.isInterrupting();
-    }
     
 
     private Long getParentTokenRefId() throws SObjectReadException, SObjectNotFoundException {
@@ -107,13 +101,23 @@ public class FlowNodeCompletionTokenProvider implements TokenProvider {
         return token.getParentRefId();
     }
 
-    private TokenInfo transmitOnlyTokenRefId() {
+    private TokenInfo transmitToken() {
         return new TokenInfo(child.getTokenRefId());
     }
 
-    private TokenInfo tansmitAllTokenInfo() throws SObjectReadException, SObjectNotFoundException {
-        SToken token = tokenService.getToken(child.getParentProcessInstanceId(), child.getTokenRefId());
-        return new TokenInfo(token.getRefId(), token.getParentRefId());
+    private TokenInfo getOutputTokenRefIdFromBoundaryEvent() throws SObjectReadException, SObjectNotFoundException {
+        // the creation of tokens for the boundaries are done inside the ExecutingBoundaryEventStateImpl
+        // we don't change tokens
+        // still need to get the refId to put on the next element
+        if (flowNodeWrapper.isInterrupting()) {
+            // we create the same token that activated the activity
+            // the activity is canceled so a token will be consumed by the aborted activity
+            SToken token = tokenService.getToken(child.getParentProcessInstanceId(), child.getTokenRefId());
+            return new TokenInfo(token.getRefId(), token.getParentRefId());
+        } else {
+            // a token with no parent is produced -> not the same "execution" than activity
+            return new TokenInfo(child.getId());
+        }
     }
 
 }

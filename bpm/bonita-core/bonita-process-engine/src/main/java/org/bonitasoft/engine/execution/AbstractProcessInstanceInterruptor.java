@@ -110,8 +110,8 @@ public abstract class AbstractProcessInstanceInterruptor {
 			children = getChildrenExcept(processInstanceId, exceptionChildId);
 			count = getNumberOfChildrenExcept(processInstanceId, exceptionChildId);
 
-			final List<Long> childrenToBeExecutedIds = interruptFlowNodeInstances(children, stateCategory);
-			stableChildrenIds.addAll(childrenToBeExecutedIds);
+			final List<Long> stableIds = interruptFlowNodeInstances(children, stateCategory);
+			stableChildrenIds.addAll(stableIds);
 		} while (count > children.size());
 
 		return stableChildrenIds;
@@ -126,18 +126,18 @@ public abstract class AbstractProcessInstanceInterruptor {
 	protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaSearchException;
 
 	private List<Long> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory) throws SBonitaException {
-		final List<Long> childrenToBeExecutedIds = new ArrayList<Long>();
+		final List<Long> stableChildrenIds = new ArrayList<Long>();
 		for (final SFlowNodeInstance child : children) {
 			if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
 				logger.log(this.getClass(), TechnicalLogSeverity.DEBUG,
 						"Put element in " + stateCategory + ", id= " + child.getId() + " name = " + child.getName() + " state = " + child.getStateName());
 			}
 			setChildStateCategory(child.getId(), stateCategory);
-			if (child.mustExecuteOnAbortOrCancelProcess()) {
-				childrenToBeExecutedIds.add(child.getId());
+			if (child.isStable()) {
+				stableChildrenIds.add(child.getId());
 			}
 		}
-		return childrenToBeExecutedIds;
+		return stableChildrenIds;
 	}
 
 	protected abstract void setChildStateCategory(long flowNodeInstanceId, SStateCategory stateCategory) throws SBonitaException;

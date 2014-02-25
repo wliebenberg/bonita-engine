@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -127,6 +128,12 @@ import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+
+import static org.junit.Assert.*;
+
 /**
  * @author Emmanuel Duchastenier
  * @author Frederic Bouquet
@@ -172,16 +179,7 @@ public class APITestUtil {
 
     public static final int DEFAULT_REPEAT_EACH = 500;
 
-    public static final int DEFAULT_TIMEOUT;
-    
-    static {
-        String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
-        if(strTimeout != null) {
-            DEFAULT_TIMEOUT = Integer.valueOf(strTimeout);
-        } else {
-            DEFAULT_TIMEOUT = 7 * 60 * 1000;
-        }
-    }
+    public static final int DEFAULT_TIMEOUT = 7 * 60 * 1000;
 
 
     @After

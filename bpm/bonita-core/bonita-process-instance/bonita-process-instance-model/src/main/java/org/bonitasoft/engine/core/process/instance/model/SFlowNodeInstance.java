@@ -58,9 +58,4 @@ public interface SFlowNodeInstance extends SFlowElementInstance {
     int getTokenCount();
 
     long getFlowNodeDefinitionId();
-    
-    /**
-     * @return true if the execution must continues automatically on abort or cancel the parent process instance
-     */
-    boolean mustExecuteOnAbortOrCancelProcess();
 }
